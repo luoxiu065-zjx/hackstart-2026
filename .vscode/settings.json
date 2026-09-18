@@ -1,11 +1,32 @@
 {
-  "python.defaultInterpreterPath": "D:\apps\Python312\python.exe",
+  "python.defaultInterpreterPath": "D:/apps/Python312/python.exe",
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
-  "[python]": { "editor.tabSize": 4 },
+  "[python]": {
+    "editor.tabSize": 4
+  },
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
   "terminal.integrated.defaultProfile.windows": "Git Bash",
   "git.autofetch": true,
-  "git.confirmSync": false
+  "git.confirmSync": false,
+  "explorer.decorations.colors": true,
+  "explorer.decorations.badges": true,
+  "scm.diffDecorations": "all",
+  "scm.diffDecorationsGutterWidth": 5,
+  "scm.countBadge": "all",
+  "problems.decorations.enabled": true,
+  "workbench.colorCustomizations": {
+    "gitDecoration.untrackedResourceForeground": "#3fe36b",
+    "gitDecoration.addedResourceForeground": "#3fe36b",
+    "gitDecoration.modifiedResourceForeground": "#ffd24a",
+    "gitDecoration.stageModifiedResourceForeground": "#ffa640",
+    "gitDecoration.deletedResourceForeground": "#ff5c5c",
+    "gitDecoration.conflictingResourceForeground": "#ff3b3b",
+    "editorGutter.addedBackground": "#3fe36b",
+    "editorGutter.modifiedBackground": "#ffd24a",
+    "editorGutter.deletedBackground": "#ff5c5c",
+    "activityBarBadge.background": "#ff6b2c",
+    "activityBarBadge.foreground": "#ffffff"
+  }
 }
