@@ -1,0 +1,11 @@
+{
+  "python.defaultInterpreterPath": "D:\apps\Python312\python.exe",
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "[python]": { "editor.tabSize": 4 },
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "git.autofetch": true,
+  "git.confirmSync": false
+}
