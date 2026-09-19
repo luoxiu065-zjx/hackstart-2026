@@ -12,15 +12,17 @@
   <div class="tagline">Autonomous Agent Fleet · Enterprise Plan</div>
   <div class="pills">
     <span>AGENTS <b id="p-agents">80</b></span>
-    <span>TASKS <b id="p-tasks">12</b></span>
+    <span>TASKS <b id="p-tasks">6</b></span>
     <span>COHERENCE <b id="p-coh">99.7%</b></span>
     <span>STATE <b id="p-state">NOMINAL</b></span>
   </div>
+  <button id="mute" title="Sound">🔊</button>
 </header>
 
 <nav>
   <div class="nav-h">FLEET</div>
-  <div class="nav on"  data-view="dashboard">Dashboard</div>
+  <div class="nav on"  data-view="pipeline">Live Pipeline</div>
+  <div class="nav"     data-view="dashboard">Dashboard</div>
   <div class="nav"     data-view="agents">Agent Assignments</div>
   <div class="nav"     data-view="code">Configuration</div>
   <div class="nav-h">ACCOUNT</div>
@@ -31,8 +33,28 @@
 
 <main>
 
+  <!-- ============ LIVE PIPELINE ============ -->
+  <section id="view-pipeline" class="view on">
+    <div class="view-h">
+      STUDY PIPELINE
+      <span class="view-note">real timetable · real modules · real prep packs</span>
+    </div>
+
+    <div class="run-bar">
+      <button id="run">▶ Run pipeline</button>
+      <span id="run-msg">6 stages · 80 agents standing by</span>
+    </div>
+
+    <div class="stages" id="stages"></div>
+
+    <div class="artifact" id="artifact" hidden>
+      <div class="art-h"><span id="art-title"></span><span id="art-tag"></span></div>
+      <pre id="art-body"></pre>
+    </div>
+  </section>
+
   <!-- ============ DASHBOARD ============ -->
-  <section id="view-dashboard" class="view on">
+  <section id="view-dashboard" class="view">
 
     <div class="promo promo-a">
       <div class="promo-tag">LIMITED TIME</div>
@@ -42,7 +64,6 @@
     </div>
 
     <div class="grid">
-
       <div class="card tiny">
         <div class="card-h">YOUR TIMETABLE <span class="card-note">consolidated · 4 sources</span></div>
         <div class="micro" id="timetable"></div>
@@ -68,16 +89,13 @@
           <span>★ NEW: AGENTS CAN NOW SEND EMOJI ★ NEW: DARK MODE (BETA, BREAKS EVERYTHING) ★ NEW: AGENTS CAN NOW SEND EMOJI ★</span>
         </div>
       </div>
-
     </div>
   </section>
 
   <!-- ============ AGENT ASSIGNMENTS ============ -->
   <section id="view-agents" class="view">
-    <div class="view-h">
-      AGENT ↔ TASK ASSIGNMENT
-      <span class="view-note">live · re-optimised continuously</span>
-    </div>
+    <div class="view-h">AGENT ↔ TASK ASSIGNMENT
+      <span class="view-note">live · re-optimised continuously</span></div>
     <table class="assign">
       <thead><tr><th>AGENT</th><th>ASSIGNED TO</th><th>ACTUALLY DOING</th><th>STATUS</th></tr></thead>
       <tbody id="assign-body"></tbody>
@@ -86,10 +104,8 @@
 
   <!-- ============ CONFIGURATION ============ -->
   <section id="view-code" class="view">
-    <div class="view-h">
-      CONFIGURATION
-      <span class="view-note">advanced · changes apply immediately</span>
-    </div>
+    <div class="view-h">CONFIGURATION
+      <span class="view-note">advanced · changes apply immediately</span></div>
     <p class="code-hint">Edit the assignment map to fix a misrouted agent. Changes are validated by the optimiser before they take effect.</p>
     <textarea id="editor" spellcheck="false"></textarea>
     <div class="code-actions">
@@ -98,7 +114,7 @@
     </div>
   </section>
 
-  <!-- ============ SETTINGS (George 的入口) ============ -->
+  <!-- ============ SETTINGS ============ -->
   <section id="view-settings" class="view">
     <div class="view-h">SETTINGS</div>
     <div class="settings-list">
@@ -125,6 +141,7 @@
   </div>
 </footer>
 
+<script src="audio.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

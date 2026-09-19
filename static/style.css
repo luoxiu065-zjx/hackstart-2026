@@ -123,3 +123,40 @@ body.chaos main{animation:jitter .2s infinite}
 @keyframes jitter{0%{transform:translate(0,0)}25%{transform:translate(1px,-1px)}
                   50%{transform:translate(-1px,1px)}75%{transform:translate(1px,1px)}
                   100%{transform:translate(0,0)}}
+
+/* ---------- 静音键 ---------- */
+#mute{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;
+      padding:5px 9px;font-size:13px;cursor:pointer;margin-left:14px}
+#mute:hover{color:var(--text);border-color:var(--cyan)}
+
+/* ---------- 流水线 ---------- */
+.run-bar{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+#run{background:var(--cyan);color:#05221d;border:none;border-radius:8px;padding:10px 22px;
+     font:inherit;font-weight:700;font-size:12.5px;cursor:pointer;letter-spacing:.5px}
+#run:disabled{background:#26344f;color:#5b6a8f;cursor:wait}
+#run-msg{font-size:11.5px;color:var(--dim)}
+
+.stages{display:flex;flex-direction:column;gap:8px}
+.stage{display:grid;grid-template-columns:78px 1fr 92px;gap:14px;align-items:center;
+       background:var(--panel);border:1px solid var(--line);border-left:3px solid #223052;
+       border-radius:9px;padding:11px 15px;opacity:.35;transition:opacity .2s,border-color .2s}
+.stage.live{opacity:1;border-left-color:var(--amber)}
+.stage.ok{opacity:1;border-left-color:var(--cyan)}
+.stage.bad{opacity:1;border-left-color:var(--red)}
+.st-agent{font-size:11.5px;color:var(--dim);letter-spacing:.8px}
+.stage.ok .st-agent{color:var(--cyan)} .stage.bad .st-agent{color:var(--red)}
+.st-name{font-size:12.5px;color:var(--text)}
+.st-detail{font-size:10.8px;color:var(--dim);margin-top:3px;line-height:1.55}
+.stage.bad .st-detail{color:var(--red)}
+.st-reroute{font-size:10.8px;color:var(--red);margin-top:3px}
+.st-ms{font-size:11px;color:#3f4d70;text-align:right;font-variant-numeric:tabular-nums}
+.stage.bad .st-ms{color:var(--red)}
+
+.artifact{margin-top:20px;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+          padding:14px 16px}
+.art-h{display:flex;justify-content:space-between;align-items:center;
+       font-size:10.5px;letter-spacing:1.2px;color:var(--dim);margin-bottom:10px}
+#art-tag{color:var(--cyan)}
+.artifact.wrong{border-color:var(--red)} .artifact.wrong #art-tag{color:var(--red)}
+#art-body{font-size:11.2px;line-height:1.75;color:#93a3c9;white-space:pre-wrap;
+          max-height:260px;overflow-y:auto}
