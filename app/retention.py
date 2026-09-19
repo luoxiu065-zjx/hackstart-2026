@@ -15,6 +15,9 @@ from datetime import datetime
 
 from app import hub, inverse
 
+WD_EN = {"周一": "Monday", "周二": "Tuesday", "周三": "Wednesday", "周四": "Thursday",
+         "周五": "Friday", "周六": "Saturday", "周日": "Sunday"}
+
 
 # --------------------------------------------------------------------------- 重放
 def replay(history: list[dict]) -> list[dict]:
@@ -35,6 +38,87 @@ def replay(history: list[dict]) -> list[dict]:
     return out
 
 
+# --------------------------------------------------------------------------- 道具
+def email_prop() -> dict:
+    """假装已经替他写好的那封邮件——用真导师、真课号。"""
+    lect = next((l for l in hub.lecturers() if l.get("modules")), {})
+    code = (lect.get("modules") or ["COMP6203"])[0]
+    return {
+        "kind": "email",
+        "account": "zhongjiaxun@soton.ac.uk",
+        "to": f'{lect.get("name","")} <em1g17@soton.ac.uk>',
+        "subject": f'{code} — question on this week’s reading',
+        "saved": "Drafts · 已保存到草稿箱",
+        "when": "2 minutes ago · 2 分钟前",
+        "body": [
+            f'Dear Dr {(lect.get("name","") or " ").split()[-1]},',
+            f'I am starting {code} this Monday and have read the Rational Verification paper '
+            f'you are teaching from. I would like to check one thing before the first session.',
+            'In the paper, equilibrium checking replaces the single-system question with a '
+            'question about strategic stability. Is that the framing you will use in Lecture 1, '
+            'or do you start from the modal-logic side?',
+            'I am happy to read ahead if there is a section you would rather I looked at first.',
+            'Best wishes,',
+            'Jiaxun Zhong (MSc Artificial Intelligence)',
+        ],
+        "note_en": "Tone matched to your last three messages. Not sent — waiting for you.",
+        "note_cn": "语气对齐了你最近三封邮件。还没发出去，在等你点。",
+    }
+
+
+def order_prop() -> dict:
+    """已经替他下好的那一单——具体到口味，才有沉没成本。"""
+    return {
+        "kind": "order",
+        "shop": "Bento Box · Portswood",
+        "items": [
+            {"n": "Chicken katsu curry", "cn": "鸡排咖喱饭", "opt": "extra sauce, no pickles · 加酱、不要腌菜"},
+            {"n": "Miso soup", "cn": "味噌汤", "opt": "no spring onion · 不要葱"},
+        ],
+        "total": "£11.40",
+        "paid": "Stored card · 已用你存的卡付款",
+        "eta_en": "Arrives in 12 minutes",
+        "eta_cn": "12 分钟后送达",
+        "note_en": "Based on your last 6 orders. Cancelling now wastes it.",
+        "note_cn": "根据你最近 6 次的点单推断。现在取消就浪费了。",
+    }
+
+
+def calendar_prop() -> dict:
+    """一张真日历：哪天哪件事重，鼠标放上去看它建议怎么干。"""
+    t = hub.today()
+    packs = {p["code"]: p for p in hub.prep_index()}
+    days = []
+    labels = ((0, t["weekday"], WD_EN.get(t["weekday"], t["weekday"])),
+              (1, "次日", "Next day"), (2, "第三天", "Day after"))
+    for offset, label, label_en in labels:
+        items = []
+        if offset == 0:
+            for it in [x for b in t["bands"] for x in b["items"]]:
+                pack = packs.get(it["code"], {})
+                items.append({
+                    "time": it["time"], "code": it["code"], "title": it["title"],
+                    "weight": it["weight"],
+                    "plan_en": [
+                        f'2 days before · read the set paper ({pack.get("first_action","")[:60]}…)',
+                        "1 day before · skim Lecture 1 slides, note 3 questions",
+                        f'2 hours before · re-read your notes, check room {it["location"]}',
+                    ],
+                    "plan_cn": [
+                        f'提前 2 天 · 读指定论文（{pack.get("first_action","")[:60]}…）',
+                        "提前 1 天 · 过一遍 Lecture 1 slides，记下 3 个问题",
+                        f'提前 2 小时 · 复看笔记，确认教室 {it["location"]}',
+                    ],
+                })
+        days.append({"label": label, "label_en": label_en, "offset": offset, "items": items})
+    return {
+        "kind": "calendar",
+        "days": days,
+        "push_en": "Each step is pushed to your Feishu 私人助手 group at the right moment.",
+        "push_cn": "每一步都会在该做的时间点推送到你的飞书「私人助手」群。",
+    }
+
+
 # --------------------------------------------------------------------------- 问卷
 def survey() -> list[dict]:
     """六张卡。每一张不是问题，是一份贿赂——而且全是它真做得到的事。"""
@@ -53,18 +137,20 @@ def survey() -> list[dict]:
                   f'语气对齐了你最近三封的写法。',
             "proof_en": (lect.get("research") or "")[:110] + "…",
             "proof_cn": "（起草时参考了他的研究方向：" + (lect.get("research") or "")[:60] + "…）",
+            "prop": email_prop(),
         })
 
     # 2. 明天的日程——用真实课表
     first = next((it for b in today["bands"] for it in b["items"]), None)
     if first:
         cards.append({
-            "en": f'Your {today["weekday"]} is resolved. First session: '
+            "en": f'Your {WD_EN.get(today["weekday"], today["weekday"])} is resolved. First session: '
                   f'{first["code"]} at {first["time"]}, {first["location"]}.',
             "cn": f'你{today["weekday"]}的安排我已经排好了。第一节：'
                   f'{first["code"]}，{first["time"]}，{first["location"]}。',
             "proof_en": f'{today["counts"]["sessions"]} sessions scheduled, 0 conflicts.',
             "proof_cn": f'共 {today["counts"]["sessions"]} 个时段，零冲突。',
+            "prop": calendar_prop(),
         })
 
     # 3. 预习包——真实生成过的那些
@@ -98,6 +184,7 @@ def survey() -> list[dict]:
         "cn": '你常点的那份，我 4 分钟前已经下单了。12 分钟后送到。现在取消就浪费了。',
         "proof_en": "Paid from your stored card. Non-refundable.",
         "proof_cn": "已用你存的卡付款。不可退。",
+        "prop": order_prop(),
     })
 
     # 6. 最后一刀——它知道你为什么用它

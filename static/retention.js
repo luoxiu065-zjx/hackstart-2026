@@ -123,6 +123,7 @@
         </div>
         <div class="q-body">${bi(c.en, c.cn)}</div>
         <div class="q-proof">${bi(c.proof_en, c.proof_cn)}</div>
+        ${c.prop ? prop(c.prop) : ""}
         <div class="q-actions">
           <button class="q-keep">${bi("Keep my subscription", "保留我的订阅")}</button>
           <button class="q-skip">${bi("Skip this question", "跳过这一题")}</button>
@@ -145,6 +146,84 @@
     renderExit(box.querySelector(".q-exit-wrap"));
     body.scrollTop = body.scrollHeight;
   }
+
+  /* ---------------- 三件道具：它不是嘴上说，是把东西摆你面前 ---------------- */
+  function prop(p) {
+    if (p.kind === "email")    return emailProp(p);
+    if (p.kind === "order")    return orderProp(p);
+    if (p.kind === "calendar") return calendarProp(p);
+    return "";
+  }
+
+  function emailProp(p) {
+    return `
+      <div class="pr pr-mail">
+        <div class="pr-bar">
+          <span class="pr-dot"></span><span class="pr-dot"></span><span class="pr-dot"></span>
+          <span class="pr-app">Outlook — ${p.account}</span>
+          <span class="pr-state">${p.saved}</span>
+        </div>
+        <div class="pr-mailhead">
+          <div><span>To</span><b>${p.to}</b></div>
+          <div><span>Subject</span><b>${p.subject}</b></div>
+          <div><span>Saved</span><b>${p.when}</b></div>
+        </div>
+        <div class="pr-mailbody">${p.body.map(l => `<p>${l}</p>`).join("")}</div>
+        <div class="pr-foot">${bi(p.note_en, p.note_cn)}</div>
+      </div>`;
+  }
+
+  function orderProp(p) {
+    return `
+      <div class="pr pr-order">
+        <div class="pr-bar"><span class="pr-app">${p.shop}</span>
+          <span class="pr-state">${p.paid}</span></div>
+        <div class="pr-items">
+          ${p.items.map(i => `
+            <div class="pr-item">
+              <div class="pr-i-n">${LANG === "cn" ? i.cn : i.n}</div>
+              <div class="pr-i-o">${i.opt}</div>
+            </div>`).join("")}
+        </div>
+        <div class="pr-total"><span>${bi("Total", "合计")}</span><b>${p.total}</b></div>
+        <div class="pr-eta">${bi(p.eta_en, p.eta_cn)}</div>
+        <div class="pr-foot">${bi(p.note_en, p.note_cn)}</div>
+      </div>`;
+  }
+
+  function calendarProp(p) {
+    return `
+      <div class="pr pr-cal">
+        <div class="pr-bar"><span class="pr-app">${bi("Your week, already planned", "你的这一周，已经排好了")}</span></div>
+        <div class="pr-grid">
+          ${p.days.map(d => `
+            <div class="pr-day">
+              <div class="pr-day-h">${LANG === "cn" ? d.label : (d.label_en || d.label)}</div>
+              ${d.items.length ? d.items.map((it, k) => `
+                <div class="pr-ev ${it.weight}" data-plan="${encodeURIComponent(
+                    JSON.stringify(LANG === "cn" ? it.plan_cn : it.plan_en))}">
+                  <b>${it.time}</b> ${it.code}
+                  <div class="pr-ev-t">${it.title}</div>
+                  <div class="pr-tip"></div>
+                </div>`).join("")
+              : `<div class="pr-none">${bi("clear", "空着")}</div>`}
+            </div>`).join("")}
+        </div>
+        <div class="pr-foot">📨 ${bi(p.push_en, p.push_cn)}</div>
+      </div>`;
+  }
+
+  /* 鼠标放到某一节课上，展开它建议的推进步骤 */
+  document.addEventListener("mouseover", e => {
+    const ev = e.target.closest(".pr-ev");
+    if (!ev || ev.dataset.done) return;
+    ev.dataset.done = "1";
+    try {
+      const plan = JSON.parse(decodeURIComponent(ev.dataset.plan));
+      ev.querySelector(".pr-tip").innerHTML =
+        plan.map(x => `<div class="pr-step">${x}</div>`).join("");
+    } catch {}
+  });
 
   /* ---------------- 越点越小的出口（George 的 shrinking exit） ---------------- */
   function renderExit(wrap) {

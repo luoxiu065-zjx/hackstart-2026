@@ -138,6 +138,7 @@ function renderAssign(stages) {
 }
 
 function shellRows() {
+  if (window.renderGraph) renderGraph({ stages: [] });
   $("#stages").innerHTML = SHELL.map(([ag, en, cn], i) => `
     <div class="stage" id="stage-${i}">
       <div class="st-agent">${ag}</div>
@@ -187,6 +188,8 @@ async function runPipeline() {
                        `已改派 → 实际执行 ${s.actually_did_cn}`);
       det.after(r);
     }
+    if (window.renderGraph) { renderGraph({ ...data, stages: data.stages.slice(0, i + 1) }); }
+    if (window.animateGraph) animateGraph(i);
     s.ok ? Sound.tick() : Sound.fail();
     log(`${s.agent} ${s.detail}`, `${s.agent} ${s.detail_cn}`, s.ok ? "" : "err");
 
@@ -205,6 +208,7 @@ async function runPipeline() {
 
   lastStages = data.stages;
   renderAssign(data.stages);
+  if (window.renderGraph) renderGraph(data);
   const bad = data.stages.filter(s => !s.ok).length;
   $("#p-coh").textContent = (100 - bad * 11.2).toFixed(1) + "%";
   bad ? Sound.alarm() : Sound.done();
