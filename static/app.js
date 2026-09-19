@@ -100,6 +100,8 @@ async function refreshState() {
     log("Trial ended. Reverting to Free plan. No reminder was sent.",
         "试用结束。已回落至免费套餐。我们没有提前提醒你。", "err");
     showDowngrade();
+    // 顺便把你踢下线，再登一次给你看看什么叫免费用户
+    setTimeout(() => window.dispatchEvent(new Event("orchestra:session-expired")), 2200);
   }
   if (account.tier !== "free" && account.tier !== "trial") {
     $("#downgrade").hidden = true;

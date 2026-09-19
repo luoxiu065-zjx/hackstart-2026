@@ -407,3 +407,31 @@ body.hostile.lens-small .micro{font-size:2px}
 #pay-decline{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer}
 .linkish{background:none;border:0;padding:0;font:inherit;cursor:pointer}
 #cancel-link{background:none;border:0;padding:0;font:inherit}
+
+/* ---------- C1–C3 过期后的重新登录 ---------- */
+.rl{position:fixed;inset:0;z-index:85;background:rgba(4,6,12,.92);
+    display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+.rl.in{opacity:1}
+.rl[hidden]{display:none}
+.rl-box{width:min(460px,calc(100% - 48px));background:var(--panel);
+        border:1px solid var(--line);border-radius:14px;padding:28px 30px}
+.rl-h{font-size:19px;font-weight:700;margin-bottom:6px}
+.rl-sub{font-size:11.5px;color:var(--dim);line-height:1.7;margin-bottom:20px}
+.rl input{width:100%;background:#0b1120;border:1px solid var(--line);border-radius:9px;
+          padding:11px 13px;color:var(--text);font:inherit;font-size:14px;outline:none;
+          margin-bottom:14px}
+.rl input:focus{border-color:var(--amber)}
+.rl-note{font-size:10.5px;color:var(--amber);line-height:1.6;margin:-6px 0 16px;min-height:14px}
+.rl button{width:100%;background:var(--cyan);color:#05221d;border:none;border-radius:9px;
+           padding:12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.rl-tiny{font-size:10px;color:#3c4a6e;text-align:center;margin-top:12px}
+
+.rl-cap{background:#0a0f1c;border:1px solid var(--line);border-radius:10px;
+        padding:14px;margin-bottom:16px}
+.cap-h{font-size:10.5px;letter-spacing:1.2px;color:var(--dim);margin-bottom:10px}
+.cap-code{display:flex;gap:6px;justify-content:center;padding:12px 0 14px;
+          background:repeating-linear-gradient(48deg,#111a2e 0 7px,#0d1424 7px 14px);
+          border-radius:7px;margin-bottom:12px}
+.cap-code span{display:inline-block;font-size:26px;font-weight:700;color:#cfe3ff;
+               letter-spacing:2px;text-shadow:0 1px 0 #2b3a5c}
+.cap-msg{font-size:10.5px;color:var(--amber);line-height:1.6;min-height:14px;margin-top:8px}
