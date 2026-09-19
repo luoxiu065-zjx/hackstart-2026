@@ -9,24 +9,30 @@
 
 <header>
   <div class="logo">ORCHESTRA<span>▸</span></div>
-  <div class="tagline">Autonomous Agent Fleet · Enterprise Plan</div>
+  <div class="tagline">Autonomous Agent Fleet · Enterprise</div>
+
+  <div class="plan" id="plan">
+    <span id="plan-name">Free trial</span>
+    <span class="plan-bar"><i id="plan-fill"></i></span>
+    <span id="plan-left">45.0s</span>
+  </div>
+
   <div class="pills">
-    <span>AGENTS <b id="p-agents">80</b></span>
-    <span>TASKS <b id="p-tasks">6</b></span>
     <span>COHERENCE <b id="p-coh">99.7%</b></span>
     <span>STATE <b id="p-state">NOMINAL</b></span>
   </div>
+  <button id="lang" title="Language">双语</button>
   <button id="mute" title="Sound">🔊</button>
 </header>
 
 <nav>
   <div class="nav-h">FLEET</div>
-  <div class="nav on"  data-view="pipeline">Live Pipeline</div>
-  <div class="nav"     data-view="dashboard">Dashboard</div>
-  <div class="nav"     data-view="agents">Agent Assignments</div>
-  <div class="nav"     data-view="code">Configuration</div>
+  <div class="nav on"  data-view="pipeline"><span data-i="nav.pipeline">Live Pipeline</span></div>
+  <div class="nav"     data-view="dashboard"><span data-i="nav.dashboard">Dashboard</span></div>
+  <div class="nav"     data-view="agents"><span data-i="nav.agents">Agent Assignments</span></div>
+  <div class="nav"     data-view="code"><span data-i="nav.code">Configuration</span></div>
   <div class="nav-h">ACCOUNT</div>
-  <div class="nav"     data-view="settings">⚙ Settings</div>
+  <div class="nav"     data-view="settings"><span data-i="nav.settings">⚙ Settings</span></div>
   <div class="spacer"></div>
   <div class="build">v4.2.1 · build 8891</div>
 </nav>
@@ -35,14 +41,21 @@
 
   <!-- ============ LIVE PIPELINE ============ -->
   <section id="view-pipeline" class="view on">
-    <div class="view-h">
-      STUDY PIPELINE
-      <span class="view-note">real timetable · real modules · real prep packs</span>
+    <div class="view-h"><span data-i="pipe.title">STUDY PIPELINE</span>
+      <span class="view-note" data-i="pipe.note">real timetable · real modules · real prep packs</span></div>
+
+    <div class="assets" id="assets"></div>
+
+    <div class="downgrade" id="downgrade" hidden>
+      <div class="dg-h" id="dg-h"></div>
+      <div class="dg-cmp" id="dg-cmp"></div>
+      <div class="dg-risk" id="dg-risk"></div>
+      <button class="dg-btn" id="dg-restore"></button>
     </div>
 
     <div class="run-bar">
-      <button id="run">▶ Run pipeline</button>
-      <span id="run-msg">6 stages · 80 agents standing by</span>
+      <button id="run"><span data-i="pipe.run">▶ Run pipeline</span></button>
+      <span id="run-msg"></span>
     </div>
 
     <div class="stages" id="stages"></div>
@@ -55,7 +68,6 @@
 
   <!-- ============ DASHBOARD ============ -->
   <section id="view-dashboard" class="view">
-
     <div class="promo promo-a">
       <div class="promo-tag">LIMITED TIME</div>
       <div class="promo-big">50% OFF</div>
@@ -65,25 +77,21 @@
 
     <div class="grid">
       <div class="card tiny">
-        <div class="card-h">YOUR TIMETABLE <span class="card-note">consolidated · 4 sources</span></div>
+        <div class="card-h" data-i="card.timetable">YOUR TIMETABLE</div>
         <div class="micro" id="timetable"></div>
       </div>
-
       <div class="card tiny">
-        <div class="card-h">SUPERVISOR RESEARCH INTERESTS</div>
+        <div class="card-h" data-i="card.research">SUPERVISOR RESEARCH INTERESTS</div>
         <div class="micro" id="research"></div>
       </div>
-
       <div class="promo promo-b">
         <div class="promo-big2">🎁 REFER A FRIEND</div>
         <div class="promo-sub">Both of you get 3 months of a feature we are deprecating in October</div>
       </div>
-
       <div class="card tiny">
-        <div class="card-h">COURSEWORK DEADLINES <span class="card-note">next 14 days</span></div>
+        <div class="card-h" data-i="card.deadlines">COURSEWORK DEADLINES</div>
         <div class="micro" id="deadlines"></div>
       </div>
-
       <div class="promo promo-c">
         <div class="promo-marquee">
           <span>★ NEW: AGENTS CAN NOW SEND EMOJI ★ NEW: DARK MODE (BETA, BREAKS EVERYTHING) ★ NEW: AGENTS CAN NOW SEND EMOJI ★</span>
@@ -94,29 +102,30 @@
 
   <!-- ============ AGENT ASSIGNMENTS ============ -->
   <section id="view-agents" class="view">
-    <div class="view-h">AGENT ↔ TASK ASSIGNMENT
-      <span class="view-note">live · re-optimised continuously</span></div>
+    <div class="view-h"><span data-i="agents.title">AGENT ↔ TASK ASSIGNMENT</span></div>
     <table class="assign">
-      <thead><tr><th>AGENT</th><th>ASSIGNED TO</th><th>ACTUALLY DOING</th><th>STATUS</th></tr></thead>
+      <thead><tr>
+        <th data-i="th.agent">AGENT</th><th data-i="th.assigned">ASSIGNED TO</th>
+        <th data-i="th.doing">ACTUALLY DOING</th><th data-i="th.status">STATUS</th>
+      </tr></thead>
       <tbody id="assign-body"></tbody>
     </table>
   </section>
 
   <!-- ============ CONFIGURATION ============ -->
   <section id="view-code" class="view">
-    <div class="view-h">CONFIGURATION
-      <span class="view-note">advanced · changes apply immediately</span></div>
-    <p class="code-hint">Edit the assignment map to fix a misrouted agent. Changes are validated by the optimiser before they take effect.</p>
+    <div class="view-h"><span data-i="code.title">CONFIGURATION</span></div>
+    <p class="code-hint" data-i="code.hint">Edit the assignment map to fix a misrouted agent. Changes are validated by the optimiser before they take effect.</p>
     <textarea id="editor" spellcheck="false"></textarea>
     <div class="code-actions">
-      <button id="apply">Apply changes</button>
+      <button id="apply" data-i="code.apply">Apply changes</button>
       <span id="apply-msg"></span>
     </div>
   </section>
 
   <!-- ============ SETTINGS ============ -->
   <section id="view-settings" class="view">
-    <div class="view-h">SETTINGS</div>
+    <div class="view-h" data-i="settings.title">SETTINGS</div>
     <div class="settings-list">
       <div class="srow">Notifications <span class="sval">All enabled (locked)</span></div>
       <div class="srow">Language <span class="sval">English (locked)</span></div>
@@ -141,7 +150,20 @@
   </div>
 </footer>
 
+<!-- ============ 付费墙 ============ -->
+<div class="modal" id="paywall" hidden>
+  <div class="paybox">
+    <div class="pay-h" id="pay-h">Performance is limited on your current plan</div>
+    <div class="pay-sub" id="pay-sub"></div>
+    <div class="tiers" id="tiers"></div>
+    <div class="pay-foot">
+      <span id="pay-decline">Continue with degraded performance</span>
+    </div>
+  </div>
+</div>
+
 <script src="audio.js"></script>
+<script src="i18n.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

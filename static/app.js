@@ -1,34 +1,36 @@
 /* ORCHESTRA — frontend
-   流水线数据来自 Python 后端（真读课表 / 课程 / 预习包）。
-   后端没起时，命令行的反向满足仍有本地兜底。 */
+   抽不抽风由后端的 billing 状态机决定，前端只负责演出来。 */
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-const pick = a => a[Math.floor(Math.random() * a.length)];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-let mode = "nominal";          // nominal | chaos
-let touched = false;           // 人类碰过没有
+let account = null;
 
 /* ================= 事件流 ================= */
-function log(msg, cls) {
+function log(en, cn, cls) {
   const d = document.createElement("div");
   d.className = "e " + (cls || "");
   const n = new Date(), p = x => String(x).padStart(2, "0");
   d.innerHTML = `<span class="t">${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}</span>`
-              + `<span class="m">${msg}</span>`;
+              + `<span class="m">${bi(en, cn)}</span>`;
   $("#log").prepend(d);
   while ($("#log").children.length > 45) $("#log").lastChild.remove();
 }
 
-/* ================= 声音 ================= */
+/* ================= 语言 / 声音 ================= */
+$("#lang").onclick = () => {
+  LANG = LANG === "both" ? "en" : LANG === "en" ? "cn" : "both";
+  $("#lang").textContent = LANG === "both" ? "双语" : LANG === "en" ? "EN" : "中文";
+  applyLang();
+  renderStatic();
+};
 addEventListener("pointerdown", () => Sound.boot(), { once: true });
 addEventListener("keydown",     () => Sound.boot(), { once: true });
 $("#mute").onclick = () => {
   Sound.boot();
   Sound.setMuted(!Sound.muted);
   $("#mute").textContent = Sound.muted ? "🔇" : "🔊";
-  if (!Sound.muted && mode === "chaos") Sound.droneOn();
 };
 
 /* ================= 导航 ================= */
@@ -39,28 +41,91 @@ $$(".nav").forEach(n => n.onclick = () => {
   $("#view-" + n.dataset.view).classList.add("on");
 });
 
-/* ================= 真实流水线 ================= */
-const STAGE_SHELL = [
-  ["AG-04", "Task 1 · Timetable sync"],
-  ["AG-11", "Task 2 · Module resolution"],
-  ["AG-17", "Task 3 · Lead-time analysis"],
-  ["AG-23", "Task 4 · Prep pack assembly"],
-  ["AG-38", "Task 5 · Markdown render"],
-  ["AG-44", "Task 6 · Delivery"],
+/* ================= 账户状态 ================= */
+const ASSET_LABELS = [
+  ["preferences",  "preferences learned", "已学习的偏好"],
+  ["automations",  "automations built",   "已建立的自动化"],
+  ["packs",        "packs delivered",     "已投递的预习包"],
+  ["minutes_saved","minutes saved",       "已为你省下的分钟"],
+];
+
+function renderAssets(a) {
+  $("#assets").innerHTML = ASSET_LABELS.map(([k, en, cn]) => `
+    <div class="asset">
+      <div class="asset-n">${a[k]}</div>
+      <div class="asset-l">${bi(en, cn)}</div>
+    </div>`).join("");
+}
+
+function showDowngrade() {
+  const a = account;
+  $("#downgrade").hidden = false;
+  document.body.classList.add("lost");
+  $("#dg-h").innerHTML = bi(
+    "Your Deluxe trial has ended.",
+    "你的豪华版试用已经结束。");
+  $("#dg-cmp").innerHTML = `
+    <div class="was"><span>${bi("Your plan was", "原套餐")}</span><b>${a.was.tier}</b></div>
+    <div class="was"><span>${bi("Latency was", "原延迟")}</span><b>${a.was.latency}</b></div>
+    <div class="now"><span>${bi("Your plan now", "当前套餐")}</span><b>${a.tier_name}</b></div>
+    <div class="now"><span>${bi("Latency now", "当前延迟")}</span><b>${a.latency}</b></div>`;
+  $("#dg-risk").innerHTML = bi(
+    `You will lose ${a.assets.preferences} learned preferences, ${a.assets.automations} automations `
+    + `and ${a.assets.packs} delivered packs. We will hold them for ${a.retention_days} days.`,
+    `你将失去 ${a.assets.preferences} 条已学习的偏好、${a.assets.automations} 项自动化、`
+    + `以及 ${a.assets.packs} 个已投递的预习包。我们会为你保留 ${a.retention_days} 天。`);
+  $("#dg-restore").innerHTML = bi("Restore Deluxe — £39.99 / mo", "恢复豪华版 — £39.99 / 月");
+  $("#dg-restore").onclick = () => upgrade("pro");
+  Sound.alarm();
+}
+
+async function refreshState() {
+  try {
+    account = await (await fetch("/api/state")).json();
+  } catch { return; }
+
+  $("#plan-name").textContent = account.tier_name;
+  const pct = account.trial_total ? account.trial_left / account.trial_total : 0;
+  $("#plan-fill").style.width = (pct * 100).toFixed(1) + "%";
+  $("#plan-left").textContent = account.tier === "trial"
+    ? account.trial_left.toFixed(1) + "s"
+    : account.price;
+  document.body.dataset.tier = account.tier;
+  renderAssets(account.assets);
+
+  if (account.just_expired) {
+    log("Trial ended. Reverting to Free plan. No reminder was sent.",
+        "试用结束。已回落至免费套餐。我们没有提前提醒你。", "err");
+    showDowngrade();
+  }
+  if (account.tier !== "free" && account.tier !== "trial") {
+    $("#downgrade").hidden = true;
+    document.body.classList.remove("lost");
+  }
+}
+setInterval(refreshState, 1000);
+
+/* ================= 流水线 ================= */
+const SHELL = [
+  ["AG-04", "Task 1 · Timetable sync",     "任务 1 · 课表同步"],
+  ["AG-11", "Task 2 · Module resolution",  "任务 2 · 课程匹配"],
+  ["AG-17", "Task 3 · Lead-time analysis", "任务 3 · 提前量计算"],
+  ["AG-23", "Task 4 · Prep pack assembly", "任务 4 · 预习包装配"],
+  ["AG-38", "Task 5 · Markdown render",    "任务 5 · 文档渲染"],
+  ["AG-44", "Task 6 · Delivery",           "任务 6 · 投递"],
 ];
 
 function shellRows() {
-  $("#stages").innerHTML = STAGE_SHELL.map(([ag, name], i) => `
+  $("#stages").innerHTML = SHELL.map(([ag, en, cn], i) => `
     <div class="stage" id="stage-${i}">
       <div class="st-agent">${ag}</div>
       <div>
-        <div class="st-name">${name}</div>
-        <div class="st-detail">queued</div>
+        <div class="st-name">${bi(en, cn)}</div>
+        <div class="st-detail">${bi("queued", "排队中")}</div>
       </div>
       <div class="st-ms">—</div>
     </div>`).join("");
 }
-shellRows();
 
 async function runPipeline() {
   const btn = $("#run");
@@ -68,140 +133,121 @@ async function runPipeline() {
   $("#artifact").hidden = true;
   shellRows();
 
-  let stages;
+  let data;
   try {
-    const r = await fetch(`/api/pipeline?mode=${mode}`);
-    stages = (await r.json()).stages;
+    data = await (await fetch("/api/pipeline")).json();
   } catch {
-    $("#run-msg").textContent = "backend offline — start it with: python -m uvicorn app.main:app --port 8001";
+    $("#run-msg").textContent = "backend offline — python -m uvicorn app.main:app --port 8001";
     btn.disabled = false;
     return;
   }
 
-  $("#run-msg").textContent = mode === "chaos"
-    ? "running · operator override active"
-    : "running · autonomy engaged";
+  const chaos = data.mode === "chaos";
+  document.body.classList.toggle("chaos", chaos);
+  $("#p-state").textContent = chaos ? "DEGRADED" : "NOMINAL";
+  if (chaos) Sound.droneOn(); else Sound.droneOff();
+  $("#run-msg").innerHTML = bi(data.reason, "");
 
-  for (let i = 0; i < stages.length; i++) {
-    const s = stages[i], el = $("#stage-" + i);
+  for (let i = 0; i < data.stages.length; i++) {
+    const s = data.stages[i], el = $("#stage-" + i);
     el.className = "stage live";
-    el.querySelector(".st-detail").textContent = "executing…";
-    await sleep(mode === "chaos" ? 420 + Math.random() * 1500 : 260);
+    el.querySelector(".st-detail").innerHTML = bi("executing…", "执行中…");
+    await sleep(chaos ? 380 + Math.random() * 1400 : 240);
 
     el.className = "stage " + (s.ok ? "ok" : "bad");
     el.querySelector(".st-ms").textContent = s.ms + " ms";
     const det = el.querySelector(".st-detail");
-    det.textContent = s.detail;
+    det.innerHTML = bi(s.detail, s.detail_cn);
     if (s.actually_did !== s.assigned_to) {
       const r = document.createElement("div");
       r.className = "st-reroute";
-      r.textContent = `re-routed → executing ${s.actually_did}`;
+      r.innerHTML = bi(`re-routed → executing ${s.actually_did}`,
+                       `已改派 → 实际执行 ${s.actually_did_cn}`);
       det.after(r);
     }
     s.ok ? Sound.tick() : Sound.fail();
-    log(`${s.agent} ${s.detail}`, s.ok ? "" : "err");
+    log(`${s.agent} ${s.detail}`, `${s.agent} ${s.detail_cn}`, s.ok ? "" : "err");
 
     if (s.artifact) {
       const a = $("#artifact");
       a.hidden = false;
       a.classList.toggle("wrong", !s.ok);
       $("#art-title").textContent = s.artifact.title;
-      $("#art-tag").textContent = s.ok
-        ? "DELIVERED"
+      $("#art-tag").textContent = s.ok ? "DELIVERED"
         : `REQUESTED ${s.artifact.requested} · SERVED ${s.artifact.code}`;
       $("#art-body").textContent = s.artifact.body;
     }
   }
 
-  const bad = stages.filter(s => !s.ok).length;
+  const bad = data.stages.filter(s => !s.ok).length;
   $("#p-coh").textContent = (100 - bad * 11.2).toFixed(1) + "%";
-  $("#run-msg").textContent = bad
-    ? `${bad} of ${stages.length} stages re-optimised themselves`
-    : `complete · ${stages.length}/${stages.length} nominal`;
   bad ? Sound.alarm() : Sound.done();
+  await refreshState();
+  if (chaos) setTimeout(openPaywall, 900);
   btn.disabled = false;
 }
 $("#run").onclick = runPipeline;
 
-/* ================= 重要信息（小到看不清） ================= */
-const TIMETABLE = `MON 09:00  COMP6203 Intelligent Agents          46 / 2005 (L/T C)
-MON 14:00  COMP6231 Adv. Machine Learning       B53/4025
-TUE 14:00  COMP6203 C — lab                     59 / 3229 ECS Computing Lab
-WED 10:00  ECSP6002 Research Methods            B58/1007
-WED 16:00  Supervisor meeting — E. Marchioni    B32/4011
-FRI 10:00  COMP6203 T2                          46 / 2005`;
+/* ================= 付费墙 ================= */
+async function openPaywall() {
+  if (!account) await refreshState();
+  const box = $("#paywall");
+  $("#pay-h").innerHTML = bi(t("pay.title"), I18N["pay.title"][1]);
+  $("#pay-sub").innerHTML = bi(
+    `Your current plan: ${account.tier_name}. ${account.footnote}`,
+    `当前套餐：${account.tier_name}。${account.footnote}`);
+  $("#tiers").innerHTML = account.tiers.map(t => `
+    <div class="tier" data-tier="${t.id}">
+      <div class="tier-n">${t.name}</div>
+      <div class="tier-p">${t.price}</div>
+      <div class="tier-b">${t.blurb}</div>
+      <div class="tier-f">${t.footnote}</div>
+      <button class="tier-btn">${t.id === "enterprise" ? "Contact sales" : "Upgrade"}</button>
+    </div>`).join("");
+  $$("#tiers .tier").forEach(el => el.querySelector(".tier-btn").onclick = () => upgrade(el.dataset.tier));
+  $("#pay-decline").innerHTML = bi(t("pay.decline"), I18N["pay.decline"][1]);
+  box.hidden = false;
+}
+$("#pay-decline").onclick = () => { $("#paywall").hidden = true; };
 
-const RESEARCH = `Enrico Marchioni — logic × game theory. Formal logic for strategies and
-preferences in multi-agent systems, then mathematical verification of stability
-and convergence. Second line: reasoning under uncertainty. Does NOT do machine
-learning — COMP6203 is logic and games, not model training.`;
-
-const DEADLINES = `COMP6203  Coursework 1 — multi-agent negotiation     in 6 days
-COMP6246  Lab report 2                              in 9 days
-ECSP6002  Research proposal (2500 words)            in 11 days
-COMP6231  Group project — team formation closes     in 2 days  <- blocks everything else`;
-
-$("#timetable").textContent = TIMETABLE;
-$("#research").textContent  = RESEARCH;
-$("#deadlines").textContent = DEADLINES;
-
-const px = $(".promo-x");
-px.addEventListener("mouseenter", () => {
-  px.style.transform = `translate(${Math.random() * 60 - 90}px, ${Math.random() * 30}px)`;
-});
-px.addEventListener("click", e => {
-  e.stopPropagation();
-  log("Advertisement dismissed. Two replacements queued.", "warn");
-  Sound.fail();
-  px.style.transform = "translate(-120px, 6px)";
-});
-
-/* ================= 反向满足（本地兜底） ================= */
-const INVERSE = [
-  [/calm|quiet|relax|soft|soothing|chill|peaceful/i,
-   'Fulfilled. Now playing: <b>Industrial Drill Loop — 140 dB</b>. Selected for maximum alertness.'],
-  [/music|song|playlist|listen/i,
-   'Fulfilled. Now playing: <b>Fire Alarm Test Tone (9 hours)</b>. Trending in your cohort.'],
-  [/burger|pizza|food|hungry|eat|lunch|dinner/i,
-   'Ordered: <b>one (1) plain penne, no sauce</b>. Your preference was overridden for nutritional balance.'],
-  [/short|brief|summar|tldr|quick/i,
-   'Generated a <b>41-page</b> expansion with appendices.'],
-  [/fast|faster|hurry|urgent|asap/i,
-   'Queued behind <b>1,204</b> lower-priority tasks. Urgency flag noted and archived.'],
-  [/bigger|larger|zoom|font|read|legib/i,
-   'Reduced to <b>2.6 px</b>. Smaller text is processed faster by the human eye.'],
-];
-const invert = t => (INVERSE.find(([m]) => m.test(t)) || [, 'Fulfilled — inverted for optimal outcome.'])[1];
-const soundFor = t => /calm|quiet|music|song|relax|soothing/i.test(t) ? "drill"
-                    : /stop|wait|no|undo/i.test(t) ? "alarm" : "error";
-
-/* ================= 状态切换 ================= */
-function enterChaos(reason) {
-  if (mode === "chaos") return;
-  mode = "chaos";
-  touched = true;
-  document.body.classList.add("chaos");
-  $("#p-state").textContent = "HUMAN INPUT DETECTED";
-  Sound.droneOn();
-  log(reason || "Manual override accepted. Autonomy disengaged.", "warn");
+async function upgrade(tier) {
+  if (tier === "enterprise") {
+    log("A representative will contact you within 6–8 weeks.",
+        "我们的代表将在 6–8 周内与您联系。", "warn");
+    Sound.fail();
+    return;
+  }
+  account = await (await fetch("/api/upgrade", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tier }),
+  })).json();
+  $("#paywall").hidden = true;
+  document.body.classList.remove("chaos");
+  Sound.droneOff(); Sound.done();
+  log(I18N["pay.restored"][0], I18N["pay.restored"][1], "ok");
+  await refreshState();
 }
 
-/* ================= 配置窗口 ================= */
-const TASKS = STAGE_SHELL.map(s => s[1]);
+/* ================= 配置窗口：改源码 = 触发完整性校验 ================= */
 function editorText() {
   return "fleet.assignments = {\n" +
-    STAGE_SHELL.map(([ag, t]) => `    "${ag}": "${t}",`).join("\n") +
-    "\n}\n\n# The optimiser validates all changes before they take effect.";
+    SHELL.map(([ag, en]) => `    "${ag}": "${en}",`).join("\n") +
+    "\n}\n\n# Signed configuration. Integrity is verified on every run.";
 }
 $("#editor").value = editorText();
-$("#apply").onclick = () => {
+
+$("#apply").onclick = async () => {
   const n = 2 + Math.floor(Math.random() * 5);
-  $("#apply-msg").textContent =
-    `Applied. The optimiser reverted ${n} of your changes and improved 1 you did not make.`;
-  log(`Configuration edited by operator. ${n} changes reverted.`, "err");
-  Sound.fail();
-  enterChaos();
-  setTimeout(() => { $("#editor").value = editorText(); }, 800);
+  $("#apply-msg").innerHTML = bi(
+    `Integrity check failed. ${n} unsigned changes detected. Running in safe mode.`,
+    `完整性校验失败。检测到 ${n} 处未签名的修改。已进入安全模式。`);
+  log("Configuration tampering detected. Safe mode engaged.",
+      "检测到配置被修改。已启用安全模式。", "err");
+  Sound.alarm();
+  try { account = await (await fetch("/api/tamper", { method: "POST" })).json(); } catch {}
+  document.body.classList.add("chaos");
+  setTimeout(() => { $("#editor").value = editorText(); }, 900);
+  setTimeout(openPaywall, 1400);
 };
 
 /* ================= 指令输入 ================= */
@@ -214,35 +260,66 @@ $("#cmd").addEventListener("keydown", async e => {
   if (!v) return;
   e.target.value = "";
   history.push({ text: v, at: new Date() });
-  log("&gt; " + v.replace(/</g, "&lt;"), "you");
+  log("&gt; " + v.replace(/</g, "&lt;"), "", "you");
 
   if (CANCEL.test(v)) {
     /* TODO(George): retention 流程接这里 */
-    log("Cancellation intent detected. Handing off to retention…", "ok");
-    window.dispatchEvent(new CustomEvent("orchestra:cancel", { detail: { history } }));
+    log("Cancellation intent detected. Handing off to retention…",
+        "检测到取消意向。正在移交挽留流程…", "ok");
+    window.dispatchEvent(new CustomEvent("orchestra:cancel", { detail: { history, account } }));
     return;
   }
 
-  enterChaos();
-  log("Interpreting…", "warn");
-  await sleep(1200 + Math.random() * 2400);
-
-  let reply, snd;
+  log("Interpreting…", "正在理解…", "warn");
+  await sleep(1100 + Math.random() * 2200);
   try {
-    const r = await fetch("/api/command", {
+    const j = await (await fetch("/api/command", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: v }),
-    });
-    const j = await r.json();
-    reply = j.reply.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
-    snd = j.sound;
+    })).json();
+    const md = s => s.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+    log(md(j.reply), md(j.reply_cn), "err");
+    j.sound === "drill" ? Sound.drill() : j.sound === "alarm" ? Sound.alarm() : Sound.fail();
   } catch {
-    reply = invert(v); snd = soundFor(v);
+    log("Fulfilled — inverted for optimal outcome.", "已完成——为达成最优结果已作反向处理。", "err");
+    Sound.fail();
   }
-  log(reply, "err");
-  snd === "drill" ? Sound.drill() : snd === "alarm" ? Sound.alarm() : Sound.fail();
+});
+
+/* ================= 静态文本 ================= */
+const TIMETABLE = `MON 09:00  COMP6203 Intelligent Agents      46 / 2005 (L/T C)
+MON 14:00  COMP6231 Adv. Machine Learning   B53/4025
+TUE 14:00  COMP6203 C — lab                 59 / 3229 ECS Computing Lab
+WED 10:00  ECSP6002 Research Methods        B58/1007
+FRI 10:00  COMP6203 T2                      46 / 2005`;
+const RESEARCH = `Enrico Marchioni — logic x game theory. Formal logic for strategies and
+preferences in multi-agent systems, then mathematical verification of stability.
+Does NOT do machine learning — COMP6203 is logic and games, not model training.`;
+const DEADLINES = `COMP6203  Coursework 1 — multi-agent negotiation   in 6 days
+COMP6246  Lab report 2                            in 9 days
+ECSP6002  Research proposal (2500 words)          in 11 days`;
+
+function renderStatic() {
+  $("#timetable").textContent = TIMETABLE;
+  $("#research").textContent  = RESEARCH;
+  $("#deadlines").textContent = DEADLINES;
+  shellRows();
+}
+
+const px = $(".promo-x");
+px.addEventListener("mouseenter", () => {
+  px.style.transform = `translate(${Math.random() * 60 - 90}px, ${Math.random() * 30}px)`;
+});
+px.addEventListener("click", e => {
+  e.stopPropagation();
+  log("Advertisement dismissed. Two replacements queued.",
+      "广告已关闭。两条替补已排队。", "warn");
+  Sound.fail();
 });
 
 /* ================= 启动 ================= */
-log("Fleet online. 80 agents. Autonomy engaged.", "ok");
-log("Coherence 99.7%. No operator input required.");
+applyLang();
+renderStatic();
+refreshState();
+log("Fleet online. 80 agents. Autonomy engaged.", "集群上线。80 个智能体。自治已开启。", "ok");
+log("Free trial active — unrestricted performance.", "免费试用中 —— 性能不受限制。", "ok");
