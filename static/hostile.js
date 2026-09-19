@@ -44,6 +44,7 @@
         grid.appendChild(d.firstElementChild);
       });
       refreshLensLabels();
+      applyLens();
       H.timer = setInterval(shuffle, SHUFFLE_MS);
       countdown();
       if (window.log) {
@@ -53,6 +54,10 @@
     } else {
       clearInterval(H.timer);
       [...grid.querySelectorAll(".promo.added")].forEach(e => e.remove());
+      LENS.level = 0;
+      document.querySelectorAll(".micro").forEach(el => {
+        el.style.fontSize = ""; el.style.color = "";
+      });
     }
   };
 
@@ -86,7 +91,10 @@
   function resetCountdown() { left = SHUFFLE_MS / 1000; }
 
   /* ---------------- C7 两面镜子，点一下功能互换 ---------------- */
-  const LENS = { swapped: false, level: 0 };   // level: 0 原始 / +1 放大 / -1 缩小
+  /* 放大不是一步到位：要连续点对 3 次才到人能读的字号。
+     而每点一次两个按钮的功能就互换，所以每一次你都得重新判断该点哪个。
+     点错就退回去一级。到达可读那一刻，计时器开始倒数，然后把内容整个挪走。 */
+  const LENS = { swapped: false, level: 0, MAX: 3 };
 
   function lensLabels() {
     const a = document.getElementById("lens-in-label");
@@ -101,9 +109,26 @@
     document.getElementById("lens-out").classList.toggle("swapped", LENS.swapped);
   }
 
+  /* 字号直接写成行内样式。之前用 class 分档，规则明明匹配上了、也没有 !important，
+     computed 却一直停在 3.4px（查了很久没查出来）。演示当天不能赌这个，
+     所以改成最确定的写法：JS 直接设 style.fontSize。 */
+  const LEVEL_PX = ["3.4px", "4.8px", "7.6px", "14px"];
+
   function applyLens() {
-    document.body.classList.toggle("lens", LENS.level > 0);
-    document.body.classList.toggle("lens-small", LENS.level < 0);
+    const b = document.body;
+    for (let i = 0; i <= LENS.MAX; i++) b.classList.toggle("lens-" + i, LENS.level === i);
+    b.classList.toggle("lens", LENS.level >= LENS.MAX);   // 只有满级才算「看得清」
+    document.querySelectorAll(".micro").forEach(el => {
+      el.style.fontSize = H.hostile ? LEVEL_PX[LENS.level] : "";
+      el.style.color = (H.hostile && LENS.level >= LENS.MAX) ? "#dbe6ff" : "";
+    });
+    const p = document.getElementById("lens-prog");
+    if (p) {
+      p.innerHTML = LENS.level >= LENS.MAX
+        ? bi("legible", "可读")
+        : bi(`legibility ${LENS.level}/${LENS.MAX}`, `可读性 ${LENS.level}/${LENS.MAX}`);
+      p.classList.toggle("done", LENS.level >= LENS.MAX);
+    }
   }
 
   document.addEventListener("click", e => {
@@ -112,7 +137,9 @@
     const wantsBigger = btn.id === "lens-in";
     const actuallyBigger = LENS.swapped ? !wantsBigger : wantsBigger;
 
-    LENS.level = actuallyBigger ? 1 : -1;
+    LENS.level = actuallyBigger
+      ? Math.min(LENS.MAX, LENS.level + 1)
+      : Math.max(0, LENS.level - 1);
     applyLens();
     if (window.Sound) actuallyBigger ? Sound.tick() : Sound.fail();
 
@@ -121,12 +148,13 @@
     lensLabels();
 
     const w = document.getElementById("lens-warn");
-    if (w) w.innerHTML = bi("Controls remapped for your convenience.",
-                            "已为你的便利重新映射控制键。");
+    if (w) w.innerHTML = LENS.level >= LENS.MAX
+      ? bi("Legible. Enjoy it while it lasts.", "可读了。趁还看得见赶紧看。")
+      : bi("Controls remapped for your convenience.", "已为你的便利重新映射控制键。");
 
     clearTimeout(H.lensTimer);
-    if (actuallyBigger) {
-      // 看得清？那就该挪位置了
+    if (LENS.level >= LENS.MAX) {
+      // 你终于看清了——那就该挪位置了
       H.lensTimer = setTimeout(() => {
         LENS.level = 0; applyLens();
         shuffle();

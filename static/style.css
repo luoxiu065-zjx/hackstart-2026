@@ -935,3 +935,31 @@ body.hostile #deluxe{display:none}
 .pf.on{grid-column:1 / -1}
 .pf.on .pf-body{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 .pf.on .pf-sec{margin-bottom:0}
+
+
+/* 放大镜分四档：要点对三次才到能读的字号 */
+body.hostile.lens-0 .micro{font-size:3.4px}
+body.hostile.lens-1 .micro{font-size:4.8px}
+body.hostile.lens-2 .micro{font-size:7.6px}
+body.hostile.lens-3 .micro{font-size:14px;color:#dbe6ff}
+body.hostile.lens-1 .card.tiny:hover .micro,
+body.hostile.lens-2 .card.tiny:hover .micro{font-size:inherit}
+body.hostile.lens-3 .card.tiny:hover .micro{font-size:14px}
+.lens-prog{font-size:10.5px;letter-spacing:1.4px;color:#6d7ca4;
+           border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:3px 10px}
+.lens-prog.done{color:#3ddc97;border-color:rgba(61,220,151,.45)}
+
+/* ---------- 任务交接记录 ---------- */
+.handover{border:1px solid rgba(255,77,109,.3);background:rgba(255,77,109,.045);
+          border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.handover:empty{display:none}
+.ho-h{display:flex;align-items:baseline;gap:12px;font-size:9.5px;letter-spacing:2.6px;
+      color:#ff8ba3;margin-bottom:12px}
+.ho-h span{letter-spacing:.4px;font-size:11px;color:#c38ea0}
+.ho-row{display:grid;grid-template-columns:62px 18px 1fr 1fr;gap:10px;align-items:baseline;
+        padding:7px 0;border-top:1px solid rgba(255,77,109,.14);font-size:11.5px}
+.ho-row:first-of-type{border-top:0}
+.ho-from{color:#ff8ba3;letter-spacing:.8px}
+.ho-arrow{color:#6b4450}
+.ho-task{color:#e8e6ef;font-family:"Noto Sans SC",system-ui,sans-serif}
+.ho-was{color:#8a6b76;line-height:1.6}

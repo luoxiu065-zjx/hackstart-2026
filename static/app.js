@@ -136,6 +136,7 @@ const SHELL = [
 
 /* ---- 智能体 ↔ 任务 分配表：用流水线的真实改派结果填 ---- */
 function renderAssign(stages) {
+  renderHandover(stages);
   if (window.renderLanes) renderLanes(stages);
   if (window.renderProfiles) renderProfiles(stages);
   const ph = $("#pf-h");
@@ -169,6 +170,39 @@ function renderAssign(stages) {
           ${bad ? bi("RE-OPTIMISED", "已重新优化") : bi("NOMINAL", "正常")}</span></td>
     </tr>`;
   }).join("");
+}
+
+/* 「任务换人」要看得见：谁接了谁的活、原主去哪了、接手的人用什么规矩干。 */
+const REASONS = [
+  ["entered a scheduled rest period", "进入了计划内休息"],
+  ["exceeded its Free-plan quota", "免费额度已用完"],
+  ["was re-optimised to a higher-value task", "被重新优化到更有价值的任务上"],
+  ["did not acknowledge within 2s", "2 秒内没有应答"],
+  ["is held by another write lock", "被另一个写锁占着"],
+];
+
+function renderHandover(stages) {
+  const box = $("#handover");
+  if (!box) return;
+  const moved = (stages || []).filter(s => s.actually_did !== s.assigned_to);
+  if (!moved.length) { box.innerHTML = ""; return; }
+
+  box.innerHTML = `
+    <div class="ho-h">${bi("HANDOVER LOG", "任务交接记录")}
+      <span>${bi(`${moved.length} tasks changed hands`, `${moved.length} 项任务换了人`)}</span></div>
+    ${moved.map((s, i) => {
+      const owner = (stages || []).find(x => x.assigned_to === s.actually_did);
+      const [rEn, rCn] = REASONS[i % REASONS.length];
+      return `
+      <div class="ho-row">
+        <span class="ho-from">${s.agent}</span>
+        <span class="ho-arrow">→</span>
+        <span class="ho-task">${bi(s.actually_did, s.actually_did_cn)}</span>
+        <span class="ho-was">${bi(
+          `taken from ${owner ? owner.agent : "—"} · ${owner ? owner.agent : "it"} ${rEn}`,
+          `接自 ${owner ? owner.agent : "—"} · ${owner ? owner.agent : "对方"}${rCn}`)}</span>
+      </div>`;
+    }).join("")}`;
 }
 
 function shellRows() {
@@ -216,6 +250,10 @@ async function runPipeline() {
     const det = el.querySelector(".st-detail");
     det.innerHTML = bi(s.detail, s.detail_cn);
     if (s.actually_did !== s.assigned_to) {
+      const owner = data.stages.find(x => x.assigned_to === s.actually_did);
+      log(`HANDOVER · ${s.agent} took over ${s.actually_did}${owner ? " from " + owner.agent : ""}`,
+          `任务交接 · ${s.agent} 接管了${s.actually_did_cn}${owner ? "（原属 " + owner.agent + "）" : ""}`,
+          "err");
       const r = document.createElement("div");
       r.className = "st-reroute";
       r.innerHTML = bi(`re-routed → executing ${s.actually_did}`,
