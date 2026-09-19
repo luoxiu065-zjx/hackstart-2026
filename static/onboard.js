@@ -7,6 +7,7 @@
   el.className = "ob";
   el.id = "ob";
   el.innerHTML = `
+      <canvas class="ob-bg" id="ob-bg"></canvas>
     <div class="ob-box" id="ob-box">
       <div class="ob-logo">ORCHESTRA<span>▸</span></div>
 
@@ -40,6 +41,72 @@
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add("in"));
+  startBackdrop();
+
+  /* ---- 动态背景：水墨晕染 + 金尘。全部现画，不下载任何图片。 ---- */
+  let bgRAF = null;
+  function startBackdrop() {
+    const cv = document.getElementById("ob-bg");
+    if (!cv) return;
+    const ctx = cv.getContext("2d");
+    let W, H, dust = [], blobs = [];
+
+    function size() {
+      W = cv.width = innerWidth * devicePixelRatio;
+      H = cv.height = innerHeight * devicePixelRatio;
+      cv.style.width = innerWidth + "px";
+      cv.style.height = innerHeight + "px";
+    }
+    size();
+    addEventListener("resize", size);
+
+    // 三团慢慢游动的墨
+    blobs = [
+      { x: .22, y: .28, r: .46, hue: "168,96,79",  a: .16, sx: .000045, sy: .000031 },
+      { x: .78, y: .18, r: .40, hue: "201,163,106", a: .13, sx: -.000037, sy: .000043 },
+      { x: .55, y: .82, r: .52, hue: "70,86,140",   a: .14, sx: .000029, sy: -.000035 },
+    ];
+    // 金尘
+    for (let i = 0; i < 70; i++) {
+      dust.push({
+        x: Math.random(), y: Math.random(),
+        r: (Math.random() * 1.5 + .5) * devicePixelRatio,
+        v: Math.random() * .000055 + .000018,
+        drift: (Math.random() - .5) * .00004,
+        ph: Math.random() * 6.28,
+      });
+    }
+
+    let t0 = performance.now();
+    function frame(now) {
+      const dt = now - t0; t0 = now;
+      ctx.clearRect(0, 0, W, H);
+
+      blobs.forEach(b => {
+        b.x += b.sx * dt; b.y += b.sy * dt;
+        if (b.x < .12 || b.x > .88) b.sx *= -1;
+        if (b.y < .10 || b.y > .90) b.sy *= -1;
+        const g = ctx.createRadialGradient(b.x * W, b.y * H, 0, b.x * W, b.y * H, b.r * W);
+        g.addColorStop(0, `rgba(${b.hue},${b.a})`);
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+      });
+
+      dust.forEach(d => {
+        d.y -= d.v * dt; d.x += d.drift * dt; d.ph += dt * .0016;
+        if (d.y < -.02) { d.y = 1.02; d.x = Math.random(); }
+        const tw = .35 + .65 * Math.abs(Math.sin(d.ph));
+        ctx.beginPath();
+        ctx.arc(d.x * W, d.y * H, d.r, 0, 6.2832);
+        ctx.fillStyle = `rgba(201,163,106,${.42 * tw})`;
+        ctx.fill();
+      });
+
+      bgRAF = requestAnimationFrame(frame);
+    }
+    bgRAF = requestAnimationFrame(frame);
+  }
 
   const $$$ = id => document.getElementById(id);
 
@@ -108,6 +175,7 @@
   }
 
   async function enter() {
+    if (bgRAF) cancelAnimationFrame(bgRAF);
     /* 试用期从进入的那一刻才开始算，别烧在登录上 */
     try { await fetch("/api/reset", { method: "POST" }); } catch {}
     el.classList.remove("in");

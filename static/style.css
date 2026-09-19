@@ -659,3 +659,26 @@ body.hostile #deluxe{display:none}
 .deluxe::before{display:none}
 .dx-quiet p{color:#4a4960}
 .dx-quiet b{color:#7a778e}
+
+/* ---------- 登录页：动态水墨 + 金尘背景（canvas 现画，零加载） ---------- */
+.ob{background:#0b0c13}
+.ob-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.ob-box{position:relative;z-index:1;
+        background:rgba(18,19,28,.78);backdrop-filter:blur(14px);
+        border:1px solid rgba(255,255,255,.08);border-radius:4px;
+        box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.ob-logo{font-family:"Playfair Display",Georgia,serif;font-size:19px;letter-spacing:1.5px;
+         font-weight:400}
+.ob-logo span{color:#c9a36a}
+.ob-h{font-family:"Playfair Display",Georgia,"Noto Serif SC",serif;font-weight:400;
+      letter-spacing:-.2px}
+.ob-h .cn{font-family:"Noto Serif SC",serif;font-size:.62em;color:#9a97ad;margin-top:5px}
+.ob-l{letter-spacing:3px;color:#5f5d73;font-size:9.5px}
+.ob input{border-radius:3px;border-color:rgba(255,255,255,.1);background:rgba(10,11,18,.6)}
+.ob input:focus{border-color:#c9a36a}
+.ob button{background:#c9a36a;color:#1a1408;border-radius:3px;letter-spacing:.5px}
+.ob-note,.ob-why-body{color:#5f5d73}
+.ob-view{color:#c9a36a}
+.ob-row{border-bottom:1px dashed rgba(255,255,255,.07)}
+.ob-tick{color:#c9a36a}
+.ob-code{border:1px dashed rgba(255,255,255,.12);border-radius:3px;background:rgba(10,11,18,.7)}
