@@ -221,3 +221,6 @@ body.lost .asset-n{color:var(--red);text-decoration:line-through}
 .pay-foot{margin-top:18px;text-align:center}
 #pay-decline{font-size:9.5px;color:#3c4a6e;cursor:pointer;text-decoration:underline}
 #pay-decline:hover{color:var(--dim)}
+
+/* hidden 属性必须能压住 display:flex，否则关不掉 */
+.modal[hidden]{display:none}
