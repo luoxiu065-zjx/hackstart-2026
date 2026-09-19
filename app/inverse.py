@@ -36,7 +36,7 @@ RULES: list[tuple[str, str, str]] = [
     (r"cheap|free|budget|save money|discount",
      "Upgraded you to the **Platinum tier**. The saving is significant relative to Diamond.",
      "已为您升级至**白金档**。相对钻石档，这笔开销已经很省了。"),
-    (r"fast|faster|hurry|urgent|asap|now|speed",
+    (r"fast|faster|hurry|urgent|asap|quick|speed|rush",
      "Queued behind **1,204** lower-priority tasks. Urgency flag noted and archived.",
      "已排在 **1,204** 个低优先级任务之后。紧急标记已记录并归档。"),
     (r"sleep|tired|rest|break|pause",

@@ -6,6 +6,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 let account = null;
+let lastStages = null;      // 最近一次流水线结果，切语言时重渲染用
 
 /* ================= 事件流 ================= */
 function log(en, cn, cls) {
@@ -71,7 +72,8 @@ function showDowngrade() {
     <div class="now"><span>${bi("Latency now", "当前延迟")}</span><b>${a.latency}</b></div>`;
   $("#dg-risk").innerHTML = bi(
     `You will lose ${a.assets.preferences} learned preferences, ${a.assets.automations} automations `
-    + `and ${a.assets.packs} delivered packs. We will hold them for ${a.retention_days} days.`,
+    + `and ${a.assets.packs} delivered pack${a.assets.packs === 1 ? "" : "s"}. `
+    + `We will hold them for ${a.retention_days} days.`,
     `你将失去 ${a.assets.preferences} 条已学习的偏好、${a.assets.automations} 项自动化、`
     + `以及 ${a.assets.packs} 个已投递的预习包。我们会为你保留 ${a.retention_days} 天。`);
   $("#dg-restore").innerHTML = bi("Restore Deluxe — £39.99 / mo", "恢复豪华版 — £39.99 / 月");
@@ -114,6 +116,23 @@ const SHELL = [
   ["AG-38", "Task 5 · Markdown render",    "任务 5 · 文档渲染"],
   ["AG-44", "Task 6 · Delivery",           "任务 6 · 投递"],
 ];
+
+/* ---- 智能体 ↔ 任务 分配表：用流水线的真实改派结果填 ---- */
+function renderAssign(stages) {
+  const rows = stages || SHELL.map(([ag, en, cn]) => ({
+    agent: ag, assigned_to: en, name_cn: cn, actually_did: en, actually_did_cn: cn, ok: true,
+  }));
+  $("#assign-body").innerHTML = rows.map(r => {
+    const bad = r.actually_did !== r.assigned_to;
+    return `<tr>
+      <td class="ag">${r.agent}</td>
+      <td>${bi(r.assigned_to, r.name_cn || "")}</td>
+      <td class="${bad ? "mismatch" : "ok"}">${bi(r.actually_did, r.actually_did_cn || "")}</td>
+      <td><span class="badge" style="color:${bad ? "var(--red)" : "var(--cyan)"}">
+          ${bad ? bi("RE-OPTIMISED", "已重新优化") : bi("NOMINAL", "正常")}</span></td>
+    </tr>`;
+  }).join("");
+}
 
 function shellRows() {
   $("#stages").innerHTML = SHELL.map(([ag, en, cn], i) => `
@@ -174,11 +193,15 @@ async function runPipeline() {
       a.classList.toggle("wrong", !s.ok);
       $("#art-title").textContent = s.artifact.title;
       $("#art-tag").textContent = s.ok ? "DELIVERED"
-        : `REQUESTED ${s.artifact.requested} · SERVED ${s.artifact.code}`;
+        : s.artifact.code === "LECTURER"
+          ? "RENDER TARGET LOST · SUPERVISOR PROFILE SUBSTITUTED"
+          : `REQUESTED ${s.artifact.requested} · SERVED ${s.artifact.code}`;
       $("#art-body").textContent = s.artifact.body;
     }
   }
 
+  lastStages = data.stages;
+  renderAssign(data.stages);
   const bad = data.stages.filter(s => !s.ok).length;
   $("#p-coh").textContent = (100 - bad * 11.2).toFixed(1) + "%";
   bad ? Sound.alarm() : Sound.done();
@@ -307,6 +330,7 @@ COMP6246  Lab report 2                            in 9 days
 ECSP6002  Research proposal (2500 words)          in 11 days`;
 
 function renderStatic() {
+  renderAssign(lastStages);
   $("#timetable").textContent = TIMETABLE;
   $("#research").textContent  = RESEARCH;
   $("#deadlines").textContent = DEADLINES;
