@@ -43,10 +43,10 @@ TIERS: dict[str, Tier] = {
                  1.0, "8.4s"),
     "basic": Tier("basic", "Basic", "£9.99 / mo",
                   "Reduced interruptions.*",
-                  "*Up to 3 interruptions per hour. Interruptions are a feature of the Basic plan.",
+                  "*Around 10 interruptions per month. Three of them total 120 hours. Interruptions are a feature of the Basic plan.",
                   0.45, "3.1s",
                   "减少中断。*",
-                  "*每小时最多 3 次中断。中断是基础版的一项功能。"),
+                  "*每月约 10 次中断。其中 3 次累计 120 小时。中断是基础版的一项功能。"),
     "pro": Tier("pro", "Deluxe", "£39.99 / mo",
                 "Interruption-free operation.**",
                 "**Excludes scheduled interruptions, maintenance interruptions, "
@@ -173,7 +173,19 @@ class Account:
         }
 
 
-ACCOUNT = Account()
+# 每个浏览器一份账户。以前是全局一份，结果两个标签页互相把对方的试用期重置了——
+# 演示当天评委用手机打开，桌面那台就会莫名其妙回到试用期。
+ACCOUNTS: dict[str, Account] = {}
+
+
+def get(client_id: str | None) -> Account:
+    cid = (client_id or "default").strip()[:64]
+    if cid not in ACCOUNTS:
+        ACCOUNTS[cid] = Account()
+    return ACCOUNTS[cid]
+
+
+ACCOUNT = get("default")        # 兼容旧调用
 
 
 def tier_list() -> list[dict]:

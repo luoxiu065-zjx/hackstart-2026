@@ -376,3 +376,28 @@ body.hostile.lens .card.tiny:hover .micro{font-size:14px}
 .lensbar button:hover{border-color:var(--cyan)}
 .lens-t{font-variant-numeric:tabular-nums}
 .lens-warn{color:var(--amber)}
+
+/* ---------- C7 两面镜子 ---------- */
+.lensbar .lb{font-size:11px;color:var(--dim);margin-left:4px}
+.lensbar button.swapped{border-color:var(--amber)}
+
+/* ---------- C10 报错袭击 + 震动袭击 ---------- */
+.errstack{position:fixed;right:320px;bottom:88px;z-index:70;display:flex;
+          flex-direction:column-reverse;gap:8px;pointer-events:none;max-height:72vh;
+          overflow:hidden}
+.errbox{background:#1b0c14;border:1px solid var(--red);border-left:4px solid var(--red);
+        border-radius:8px;padding:11px 15px;min-width:340px;max-width:420px;
+        box-shadow:0 10px 30px rgba(0,0,0,.55);
+        animation:errin .18s ease}
+.errbox b{display:block;color:var(--red);font-size:11.5px;letter-spacing:.6px;margin-bottom:4px}
+.errbox span{font-size:11px;color:#c38ea0;line-height:1.6}
+@keyframes errin{from{opacity:0;transform:translateX(26px) scale(.97)}to{opacity:1;transform:none}}
+
+body.quake{animation:quake .07s infinite}
+@keyframes quake{0%{transform:translate(0,0)}
+                 25%{transform:translate(3px,-2px) rotate(.12deg)}
+                 50%{transform:translate(-3px,2px) rotate(-.12deg)}
+                 75%{transform:translate(2px,3px)}
+                 100%{transform:translate(0,0)}}
+body.quake .assign td{color:var(--red)}
+body.hostile.lens-small .micro{font-size:2px}

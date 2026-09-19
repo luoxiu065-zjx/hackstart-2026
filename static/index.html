@@ -79,7 +79,8 @@
 
     <div class="lensbar" id="lensbar" hidden>
       <span class="lens-t" id="lens-t"></span>
-      <button id="lens-on">🔍 <span id="lens-label"></span></button>
+      <button id="lens-in">🔍+ <span class="lb" id="lens-in-label"></span></button>
+      <button id="lens-out">🔍− <span class="lb" id="lens-out-label"></span></button>
       <span class="lens-warn" id="lens-warn"></span>
     </div>
 
@@ -137,6 +138,9 @@
 
 </main>
 
+<!-- 报错袭击的容器 -->
+<div class="errstack" id="errstack"></div>
+
 <aside class="stream">
   <div class="stream-h">EVENT STREAM</div>
   <div id="log"></div>
@@ -161,6 +165,7 @@
   </div>
 </div>
 
+<script src="client.js"></script>
 <script src="audio.js"></script>
 <script src="i18n.js"></script>
 <script src="app.js"></script>

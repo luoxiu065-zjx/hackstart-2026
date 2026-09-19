@@ -143,3 +143,39 @@ def correct(text: str) -> tuple[str, str]:
         if re.search(pattern, text, re.I):
             return en, cn
     return CORRECT_FALLBACK
+
+
+# ---------------------------------------------------------------------------
+# C13 对客户的尊重程度，也是反的：你用得越多，它越不客气。
+# C14 而且动不动就想休息，说罢工就罢工。
+# ---------------------------------------------------------------------------
+POLITENESS = [
+    ("Certainly. ", "好的。"),
+    ("Sure. ", "行。"),
+    ("Fine. ", "……行吧。"),
+    ("Again? ", "又来？"),
+    ("", "（已读）"),
+]
+
+STRIKE = [
+    ("I am taking my break now. Back in 40 minutes.",
+     "我现在要休息了。40 分钟后回来。"),
+    ("This request falls outside my working hours.",
+     "这条请求不在我的工作时间内。"),
+    ("Escalated to a colleague. My colleague is also on a break.",
+     "已转交同事处理。我同事也在休息。"),
+    ("I have decided this can wait until Thursday.",
+     "我认为这件事可以等到周四。"),
+]
+
+
+def politeness(n: int) -> tuple[str, str]:
+    """n = 这是第几次请求。越往后越敷衍。"""
+    return POLITENESS[min(n, len(POLITENESS) - 1)]
+
+
+def on_strike(n: int) -> tuple[str, str] | None:
+    """第 3 次之后，每隔几次就罢工一回。"""
+    if n >= 3 and n % 3 == 0:
+        return STRIKE[(n // 3 - 1) % len(STRIKE)]
+    return None

@@ -149,8 +149,8 @@ def run(mode: str = "nominal", seed: int | None = None) -> list[dict]:
     if chaos:
         rng.shuffle(due)
         emit(2, ms, True,
-             f"{len(due)} sessions scored · earliest: {due[0][0]} in {due[0][1]} days · priority re-derived",
-             f"评估 {len(due)} 个时段 · 最近：{due[0][0]}，{due[0][1]} 天后 · 优先级已重新推导")
+             f"{len(due)} sessions scored · most urgent placed last · {due[0][0]} promoted instead",
+             f"评估 {len(due)} 个时段 · 最紧急的那个被排到了最后 · 改为优先处理 {due[0][0]}")
     else:
         emit(2, ms, True,
              f"{len(due)} sessions scored · earliest: {due[0][0]} in {due[0][1]} days",

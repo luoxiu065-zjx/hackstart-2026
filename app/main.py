@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -42,28 +42,35 @@ class Upgrade(BaseModel):
 # 商业逻辑
 # ---------------------------------------------------------------------------
 
+def _acc(request: Request) -> billing.Account:
+    return billing.get(request.headers.get("X-Client"))
+
+
 @app.get("/api/state")
-def state():
-    return {**billing.ACCOUNT.snapshot(), "tiers": billing.tier_list()}
+def state(request: Request):
+    return {**_acc(request).snapshot(), "tiers": billing.tier_list()}
 
 
 @app.post("/api/upgrade")
-def upgrade(u: Upgrade):
-    billing.ACCOUNT.upgrade(u.tier)
-    return billing.ACCOUNT.snapshot()
+def upgrade(u: Upgrade, request: Request):
+    acc = _acc(request)
+    acc.upgrade(u.tier)
+    return acc.snapshot()
 
 
 @app.post("/api/tamper")
-def tamper():
+def tamper(request: Request):
     """用户动了配置 → 完整性校验失败 → 强制混乱。"""
-    billing.ACCOUNT.tamper()
-    return billing.ACCOUNT.snapshot()
+    acc = _acc(request)
+    acc.tamper()
+    return acc.snapshot()
 
 
 @app.post("/api/reset")
-def reset():
-    billing.ACCOUNT.reset()
-    return billing.ACCOUNT.snapshot()
+def reset(request: Request):
+    acc = _acc(request)
+    acc.reset()
+    return acc.snapshot()
 
 
 # ---------------------------------------------------------------------------
@@ -71,9 +78,9 @@ def reset():
 # ---------------------------------------------------------------------------
 
 @app.get("/api/pipeline")
-def run_pipeline(seed: int | None = None):
+def run_pipeline(request: Request, seed: int | None = None):
     """真实流水线。抽不抽风由套餐决定，不由前端决定。"""
-    acc = billing.ACCOUNT
+    acc = _acc(request)
     acc.runs += 1
     glitch, reason, reason_cn = acc.should_glitch()
     if glitch:
@@ -87,10 +94,30 @@ def run_pipeline(seed: int | None = None):
     }
 
 
+_REQUESTS = {"n": 0}
+
+
 @app.post("/api/command")
-def command(c: Command):
+def command(c: Command, request: Request):
+    acc = _acc(request)
+    _REQUESTS["n"] += 1
+    n = _REQUESTS["n"]
+
+    # 豪华版：正常做事，而且客客气气
+    if acc.tier in ("trial", "pro"):
+        en, cn = inverse.correct(c.text)
+        return {"reply": en, "reply_cn": cn, "sound": "ok", "strike": False}
+
+    # C14 罢工
+    strike = inverse.on_strike(n)
+    if strike:
+        return {"reply": strike[0], "reply_cn": strike[1], "sound": "alarm", "strike": True}
+
+    # C11 反向满足 + C13 尊重程度递减
     en, cn = inverse.invert(c.text)
-    return {"reply": en, "reply_cn": cn, "sound": inverse.sound_for(c.text)}
+    pen, pcn = inverse.politeness(n)
+    return {"reply": pen + en, "reply_cn": pcn + cn,
+            "sound": inverse.sound_for(c.text), "strike": False}
 
 
 class CancelReq(BaseModel):
@@ -98,15 +125,16 @@ class CancelReq(BaseModel):
 
 
 @app.post("/api/cancel")
-def cancel(req: CancelReq):
+def cancel(req: CancelReq, request: Request):
     """取消意向一出现，它立刻变成完美的自己。"""
-    billing.ACCOUNT.upgrade("pro")          # 性能瞬间恢复——证明它一直做得到
+    acc = _acc(request)
+    acc.upgrade("pro")                      # 性能瞬间恢复——证明它一直做得到
     return {
         "replay": retention.replay(req.history),
         "survey": retention.survey(),
         "finale": retention.FINALE,
         "live_work": retention.live_work(),
-        "account": billing.ACCOUNT.snapshot(),
+        "account": acc.snapshot(),
     }
 
 
