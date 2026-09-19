@@ -263,7 +263,7 @@
     const live = document.getElementById("ret-live");
     if (live) live.remove();
     const f = R.data.finale;
-    if (window.Sound) { Sound.setMuted(true); }
+    if (window.Sound) Sound.droneOff();   // 只停嗡鸣；别全局静音，否则之后整个应用都没声了
     R.el.classList.add("dead");
     $("#ret-body").innerHTML = `
       <section class="ret-sec in fin">

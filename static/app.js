@@ -26,12 +26,26 @@ $("#lang").onclick = () => {
   applyLang();
   renderStatic();
 };
-addEventListener("pointerdown", () => Sound.boot(), { once: true });
-addEventListener("keydown",     () => Sound.boot(), { once: true });
+/* 每次手势都确认一次音频上下文是 running——只在第一次 boot 会漏掉
+   「上下文在无手势时就被建出来、之后一直 suspended」这种情况。 */
+addEventListener("pointerdown", () => Sound.ensure());
+addEventListener("keydown",     () => Sound.ensure());
+/* 点喇叭：切静音；切回有声时放一声测试音，让人当场知道音频到底通没通。
+   （AudioContext 只能在真实手势里 resume，所以这里是最可靠的自检入口。） */
 $("#mute").onclick = () => {
-  Sound.boot();
+  Sound.ensure();
   Sound.setMuted(!Sound.muted);
-  $("#mute").textContent = Sound.muted ? "🔇" : "🔊";
+  const btn = $("#mute");
+  btn.textContent = Sound.muted ? "🔇" : "🔊";
+  if (!Sound.muted) {
+    Sound.done();
+    setTimeout(() => {
+      btn.title = "audio: " + Sound.state;
+      log(`Audio check — context is ${Sound.state}. If you heard nothing, the tab or system is muted.`,
+          `音频自检 —— 上下文状态 ${Sound.state}。如果你没听见声音，是标签页或系统被静音了。`,
+          Sound.state === "running" ? "ok" : "err");
+    }, 120);
+  }
 };
 
 /* ================= 导航 ================= */
@@ -336,7 +350,11 @@ $("#cmd").addEventListener("keydown", async e => {
     })).json();
     const md = s => s.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
     log(md(j.reply), md(j.reply_cn), "err");
-    j.sound === "drill" ? Sound.drill() : j.sound === "alarm" ? Sound.alarm() : Sound.fail();
+    Sound.ensure();
+    if (j.sound === "drill") Sound.drill();
+    else if (j.sound === "alarm") Sound.alarm();
+    else if (j.sound === "ok") Sound.done();      // 豪华版：好好办事，给个悦耳的确认音
+    else Sound.fail();
   } catch {
     log("Fulfilled — inverted for optimal outcome.", "已完成——为达成最优结果已作反向处理。", "err");
     Sound.fail();

@@ -4,6 +4,15 @@
 const Sound = (() => {
   let ctx = null, master = null, drone = null, muted = false;
 
+  /* 浏览器建出来的 AudioContext 默认是 suspended，不 resume 就完全没声音。
+     光在首次点击时 boot 还不够——上下文可能在没有手势的时候就被建出来了，
+     之后一直挂着。所以每次发声前都确认一次。 */
+  function ensure() {
+    boot();
+    if (ctx && ctx.state === "suspended") ctx.resume().catch(() => {});
+    return ctx;
+  }
+
   function boot() {                        // 浏览器要求先有用户交互
     if (ctx) return;
     ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -21,6 +30,7 @@ const Sound = (() => {
   }
 
   function beep(freq, dur = 0.07, type = "sine", vol = 0.25) {
+    ensure();
     if (!ctx || muted) return;
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = type; o.frequency.value = freq;
@@ -37,12 +47,14 @@ const Sound = (() => {
 
   /* ---------- 混乱态：刺耳 ---------- */
   function fail() {
+    ensure();
     if (!ctx || muted) return;
     beep(160, 0.18, "square", 0.3);
     setTimeout(() => beep(120, 0.26, "sawtooth", 0.28), 90);
   }
 
   function alarm() {
+    ensure();
     if (!ctx || muted) return;
     let f = 700;
     for (let i = 0; i < 6; i++) {
@@ -53,6 +65,7 @@ const Sound = (() => {
 
   /* 用户要「舒缓的音乐」时，给他这个 */
   function drill(seconds = 3.2) {
+    ensure();
     if (!ctx || muted) return;
     const src = ctx.createBufferSource();
     src.buffer = noiseBuffer(seconds); src.loop = true;
@@ -77,6 +90,7 @@ const Sound = (() => {
 
   /* 混乱态的背景嗡鸣 */
   function droneOn() {
+    ensure();
     if (!ctx || drone || muted) return;
     const o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
     o1.type = "sawtooth"; o1.frequency.value = 55;
@@ -101,6 +115,7 @@ const Sound = (() => {
     if (v) droneOff();
   }
 
-  return { boot, tick, done, fail, alarm, drill, droneOn, droneOff, setMuted,
-           get muted() { return muted; } };
+  return { boot, ensure, tick, done, fail, alarm, drill, droneOn, droneOff, setMuted,
+           get muted() { return muted; },
+           get state() { return ctx ? ctx.state : "none"; } };
 })();
