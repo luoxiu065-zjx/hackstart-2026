@@ -41,10 +41,12 @@
     </div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add("in"));
-  startBackdrop();
 
-  /* ---- 动态背景：水墨晕染 + 金尘。全部现画，不下载任何图片。 ---- */
-  let bgRAF = null;
+  /* ---- 动态背景：水墨晕染 + 金尘。全部现画，不下载任何图片。 ----
+     注意：这里必须用 var，而且 startBackdrop() 要放在文件末尾调用。
+     之前写成「先调用、后 let 声明」，触发 TDZ 报错，整个脚本后面的
+     事件绑定全被跳过——登录按钮点了没反应就是这么来的。 */
+  var bgRAF = null;
   function startBackdrop() {
     const cv = document.getElementById("ob-bg");
     if (!cv) return;
@@ -196,4 +198,7 @@
   ["ob-user", "ob-pass"].forEach(id => $$$(id).addEventListener("keydown", e => {
     if (e.key === "Enter") $$$("ob-go").click();
   }));
+
+  /* 所有交互都绑好了，最后才开背景动画 */
+  startBackdrop();
 })();

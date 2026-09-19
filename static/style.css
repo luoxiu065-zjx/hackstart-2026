@@ -682,3 +682,32 @@ body.hostile #deluxe{display:none}
 .ob-row{border-bottom:1px dashed rgba(255,255,255,.07)}
 .ob-tick{color:#c9a36a}
 .ob-code{border:1px dashed rgba(255,255,255,.12);border-radius:3px;background:rgba(10,11,18,.7)}
+
+/* ---------- 登录卡重做：窄、薄、克制 ---------- */
+.ob-box{
+  width:min(400px,calc(100% - 40px));
+  padding:30px 32px 26px;
+  background:rgba(16,17,25,.86);
+  backdrop-filter:blur(18px) saturate(115%);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:3px;
+  box-shadow:0 24px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(201,163,106,.06);
+}
+.ob-logo{font-size:15px;letter-spacing:2.5px;margin-bottom:4px;color:#e8e6ef}
+.ob-box::after{content:"";display:block}
+.ob-h{font-size:24px;margin:22px 0 20px}
+.ob-h .cn{font-size:.55em;color:#7a778e;margin-top:4px}
+.ob-l{margin-bottom:7px;font-size:9px;letter-spacing:3.4px;color:#6b6880}
+.ob-l .cn{display:inline;margin-left:7px;letter-spacing:1px;color:#4d4b60}
+.ob input{padding:10px 12px;font-size:13.5px;margin-bottom:15px;border-radius:2px}
+.ob-note{font-size:10.5px;line-height:1.8;color:#5f5d73;margin-bottom:20px}
+.ob-note .cn{color:#4a4960}
+.ob button{width:100%;padding:11px;font-size:13px;font-weight:600}
+.ob button .cn{display:inline;margin-left:8px;color:rgba(26,20,8,.62);font-size:.92em}
+.ob-tiny{font-size:10px;margin-top:14px;text-align:center;color:#4d4b60}
+.ob-tiny .cn{display:inline;margin-left:6px}
+.ob-why-body{font-size:10.5px;margin-top:10px}
+/* 启动那一屏字紧一点 */
+.ob-row{grid-template-columns:16px 1fr auto auto;font-size:11.5px;padding:8px 0}
+.ob-src{font-size:10px}
+.ob-view{font-size:10px}
