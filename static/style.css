@@ -963,3 +963,12 @@ body.hostile.lens-3 .card.tiny:hover .micro{font-size:14px}
 .ho-arrow{color:#6b4450}
 .ho-task{color:#e8e6ef;font-family:"Noto Sans SC",system-ui,sans-serif}
 .ho-was{color:#8a6b76;line-height:1.6}
+
+
+/* 登录页底部两个链接：为什么要账号 / 这是什么 */
+.ob-links{display:flex;justify-content:space-between;gap:14px;margin-top:14px}
+.ob-links .ob-tiny{margin-top:0}
+.ob-about{color:#c9a36a;text-decoration:none;border-bottom:1px solid rgba(201,163,106,.35);
+          padding-bottom:1px}
+.ob-about:hover{border-bottom-color:#c9a36a}
+.ob-about .cn{display:inline;margin-left:6px;color:rgba(201,163,106,.62)}

@@ -23,7 +23,10 @@
           <span class="cn">屏幕上打码，跟你平常用的一样。</span>
         </div>
         <button id="ob-go">Continue<span class="cn">继续</span></button>
-        <div class="ob-tiny" id="ob-why">Why do you need this?<span class="cn">为什么需要这个？</span></div>
+        <div class="ob-links">
+          <span class="ob-tiny" id="ob-why">Why do you need this?<span class="cn">为什么需要这个？</span></span>
+          <a class="ob-tiny ob-about" href="/about" target="_blank" rel="noopener">What is this?<span class="cn">这是什么？</span></a>
+        </div>
         <div class="ob-why-body" id="ob-why-body" hidden>
           To read your own timetable feed and coursework pages. Nothing is uploaded.
           <span class="cn">用来读你自己的课表订阅和作业页面。不会上传任何东西。</span>

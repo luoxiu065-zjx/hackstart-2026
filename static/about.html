@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+  html{color-scheme:dark}
+  body{margin:0}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<title>ORCHESTRA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Sans+SC:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ink:#0b0c13; --panel:#14151f; --raised:#1a1c28;
+    --fg:#e8e6ef; --dim:#9a97ad; --faint:#5f5d73; --hair:rgba(255,255,255,.08);
+    --gold:#c9a36a; --clay:#a8604f; --green:#5fbf95;
+    --display:"Playfair Display",Georgia,serif;
+    --body:"Noto Sans SC","PingFang SC",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--fg);font-family:var(--body);
+       font-weight:300;line-height:1.75;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:940px;margin:0 auto;padding-block:0 96px;padding-left:24px;padding-right:24px}
+  .cn{display:block;color:var(--dim);font-size:.82em;font-weight:300;margin-top:4px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.32em;color:var(--gold);
+           text-transform:uppercase}
+
+  /* ---------- 开场 ---------- */
+  header{padding-block:88px 56px;border-bottom:1px solid var(--hair)}
+  h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,8vw,86px);
+     line-height:.98;letter-spacing:-.03em;margin:18px 0 0}
+  .thesis{font-family:var(--display);font-size:clamp(21px,3.4vw,31px);line-height:1.34;
+          margin:30px 0 0;max-width:22ch;text-wrap:balance}
+  .thesis .cn{font-family:var(--body);font-size:.55em;margin-top:12px;max-width:28ch}
+  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:38px;
+        font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+  .meta b{color:var(--dim);font-weight:400}
+
+  /* ---------- 通用段 ---------- */
+  section{padding-block:56px;border-bottom:1px solid var(--hair)}
+  h2{font-family:var(--display);font-weight:400;font-size:clamp(25px,4vw,34px);
+     line-height:1.2;letter-spacing:-.02em;margin:10px 0 22px;text-wrap:balance}
+  h2 .cn{font-family:var(--body);font-size:.5em;margin-top:8px}
+  p{margin:0 0 16px;max-width:66ch}
+  p:last-child{margin-bottom:0}
+  .lead{font-size:16.5px}
+  em{color:var(--gold);font-style:normal}
+
+  /* ---------- 数据栅格 ---------- */
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+         gap:1px;background:var(--hair);border:1px solid var(--hair);margin-top:28px}
+  .fact{background:var(--ink);padding:20px 18px}
+  .fact b{display:block;font-family:var(--display);font-size:32px;line-height:1;
+          color:var(--gold);font-weight:400;font-variant-numeric:tabular-nums}
+  .fact span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+             color:var(--faint);margin-top:9px;text-transform:uppercase}
+  .fact i{display:block;font-style:normal;font-size:11px;color:var(--dim);margin-top:2px}
+
+  /* ---------- 幕 ---------- */
+  .act{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:34px;
+       padding-block:34px;border-top:1px solid var(--hair)}
+  .act:first-of-type{border-top:0}
+  .act h3{font-family:var(--display);font-weight:400;font-size:21px;margin:8px 0 12px;
+          line-height:1.3}
+  .act h3 .cn{font-family:var(--body);font-size:.62em;margin-top:6px}
+  .act p{font-size:14px;color:var(--dim)}
+  .evidence{background:var(--panel);border:1px solid var(--hair);padding:18px 20px;
+            font-family:var(--mono);font-size:12px;line-height:1.95;color:var(--dim)}
+  .evidence div{padding:5px 0;border-top:1px solid var(--hair)}
+  .evidence div:first-child{border-top:0;padding-top:0}
+  .evidence b{color:var(--fg);font-weight:500}
+  .evidence .bad{color:var(--clay)}
+  .evidence .good{color:var(--green)}
+
+  /* ---------- 掉档对比 ---------- */
+  .drop{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;
+        margin-top:26px;background:var(--panel);border:1px solid var(--hair);padding:22px}
+  .drop .side{display:grid;gap:12px}
+  .drop .row{display:flex;justify-content:space-between;gap:14px;font-size:13px}
+  .drop .row span{color:var(--faint);font-family:var(--mono);font-size:11px;
+                  letter-spacing:.08em}
+  .drop .row b{font-weight:500;font-variant-numeric:tabular-nums}
+  .drop .paid b{color:var(--gold)}
+  .drop .free b{color:var(--clay)}
+  .drop .arrow{font-family:var(--mono);color:var(--faint);font-size:20px}
+
+  /* ---------- 可以真玩的放大镜 ---------- */
+  .toy{background:var(--panel);border:1px solid var(--hair);padding:22px;margin-top:26px}
+  .toy-h{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:16px}
+  .toy-h .eyebrow{flex:1 1 auto}
+  .toy button{font:inherit;font-family:var(--mono);font-size:12px;background:var(--raised);
+              color:var(--fg);border:1px solid var(--hair);padding:7px 14px;cursor:pointer;
+              border-radius:2px}
+  .toy button:hover{border-color:var(--gold)}
+  .toy button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .toy .prog{font-family:var(--mono);font-size:11px;color:var(--faint);
+             border:1px solid var(--hair);padding:5px 11px;border-radius:99px}
+  .toy .prog.done{color:var(--green);border-color:rgba(95,191,149,.4)}
+  #tiny{font-family:var(--mono);font-size:3.4px;line-height:1.5;color:#8fa0c8;
+        white-space:pre-wrap;transition:font-size .25s ease}
+  .toy-note{font-size:12px;color:var(--faint);margin-top:14px}
+
+  /* ---------- 定价 ---------- */
+  .tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;
+         margin-top:26px}
+  .tier{background:var(--panel);border:1px solid var(--hair);padding:20px}
+  .tier.hero{border-color:rgba(201,163,106,.42)}
+  .tier .name{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--faint);
+              text-transform:uppercase}
+  .tier .price{font-family:var(--display);font-size:27px;margin:8px 0 10px;font-weight:400}
+  .tier .promise{font-size:13.5px;margin-bottom:12px}
+  .tier .fine{font-size:11.5px;line-height:1.8;color:var(--clay);
+              border-top:1px dashed var(--hair);padding-top:11px}
+
+  /* ---------- 诚实声明 ---------- */
+  .honest{background:rgba(168,96,79,.07);border-left:2px solid var(--clay);
+          padding:20px 22px;margin-top:26px}
+  .honest p{font-size:14px;color:var(--dim)}
+  .honest p:first-child{color:var(--fg)}
+
+  /* ---------- 试一试 ---------- */
+  .try{display:grid;gap:14px;margin-top:24px}
+  .try a{font-family:var(--mono);font-size:15px;color:var(--gold);text-decoration:none;
+         border:1px solid rgba(201,163,106,.4);padding:14px 18px;display:inline-block;
+         word-break:break-all}
+  .try a:hover{background:rgba(201,163,106,.08)}
+  .steps{counter-reset:s;display:grid;gap:10px;margin:0;padding:0;list-style:none}
+  .steps li{display:grid;grid-template-columns:26px 1fr;gap:12px;font-size:14px;
+            color:var(--dim)}
+  .steps li::before{counter-increment:s;content:counter(s);font-family:var(--mono);
+                    font-size:11px;color:var(--gold);padding-top:4px}
+  .steps b{color:var(--fg);font-weight:500}
+
+  footer{padding-block:72px 0;text-align:center}
+  .closer{font-family:var(--display);font-size:clamp(26px,5vw,44px);line-height:1.22;
+          letter-spacing:-.02em;text-wrap:balance}
+  .closer .cn{font-size:.46em;margin-top:16px;color:var(--dim)}
+  .sig{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:34px;
+       letter-spacing:.1em}
+
+  @media (max-width:720px){
+    .act{grid-template-columns:1fr;gap:18px}
+    .drop{grid-template-columns:1fr;gap:14px}
+    .drop .arrow{transform:rotate(90deg);justify-self:center}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">HackStart 2026 · Stubborn Software</div>
+    <h1>ORCHESTRA</h1>
+    <p class="thesis">A study assistant that is excellent when you pay, and hostile when you don't.
+      <span class="cn">一个学业助手。付费时它很好用，不付费时，它跟你作对。</span>
+    </p>
+    <div class="meta">
+      <span>Jiaxun Zhong · <b>MSc Artificial Intelligence</b></span>
+      <span>Built in one day · <b>10 hours</b></span>
+      <span>Theme · <b>fight the user</b></span>
+    </div>
+  </header>
+
+  <section>
+    <div class="eyebrow">Premise / 前提</div>
+    <h2>The brief asked for annoying software. This is software that turns on you — for money.
+      <span class="cn">题目要的是"烦人的软件"。这是一个会翻脸的软件——为了钱。</span></h2>
+    <p class="lead">The examples in the brief were all <em>one annoying feature</em>: a password manager
+      that reveals one character at a time, an editor that deletes your work if you pause.
+      ORCHESTRA is a working product whose degradation is a <em>pricing decision</em>.</p>
+    <p class="lead cn" style="color:var(--dim);font-size:15px">官方给的示例都是"一个烦人的功能"。
+      ORCHESTRA 是一个真能用的产品，而它的降级是一项<em>定价决策</em>。</p>
+    <p>It satirises something that exists: support you cannot reach until you say the word "cancel",
+      at which point a human appears instantly with a discount.
+      <span class="cn">它讽刺的东西真实存在：客服在你说"取消"之前永远找不到，你一说取消，真人和折扣立刻出现。</span></p>
+  </section>
+
+  <section>
+    <div class="eyebrow">Evidence / 证据</div>
+    <h2>Every number on screen is real.
+      <span class="cn">屏幕上的每一个数字都是真的。</span></h2>
+    <p>The app reads a real Southampton timetable feed, real module records and prep packs generated
+      by a study pipeline that has been running on a server for a week.
+      <span class="cn">它读的是真实的南安课表订阅、真实的课程记录，以及一套已经在服务器上跑了一周的学业流水线生成的预习包。</span></p>
+    <div class="facts">
+      <div class="fact"><b>124</b><span>calendar events</span><i>课表事件</i></div>
+      <div class="fact"><b>9</b><span>modules · 5 confirmed</span><i>门课 · 5 门已确认</i></div>
+      <div class="fact"><b>11</b><span>weekly sessions</span><i>每周时段</i></div>
+      <div class="fact"><b>3</b><span>prep packs written</span><i>份预习包已写好</i></div>
+    </div>
+    <div class="honest">
+      <p>One honest note. <span class="cn">一点必须说明的。</span></p>
+      <p>The login screen is a prop — it does not sign into the university. A password alone never
+        could: the university uses SSO with multi-factor authentication. The real access happens on a
+        server, through an authenticated browser session that is refreshed every 30 minutes.
+        <span class="cn">登录框是道具，它不会真的登录学校系统。光有账号密码本来也进不去——学校走 SSO 加多因素认证。
+        真正的访问发生在服务器上，靠一个每 30 分钟续期一次的已登录浏览器会话。</span></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Five acts / 五幕</div>
+    <h2>It earns your trust first. That is the point.
+      <span class="cn">它先把你的信任赚到手。这是设计的核心。</span></h2>
+
+    <div class="act">
+      <div>
+        <h3>I · Transparent onboarding<span class="cn">开场：全程透明</span></h3>
+        <p>Two fields, a masked password, and a plain sentence about why it needs them. Then six
+          startup steps run in front of you — and each one opens the <em>real source code</em> that
+          just executed, with its filename and line number.</p>
+        <p class="cn">两个输入框、打码的密码、一句话说明为什么要它们。然后六步启动当着你的面跑，
+          每一步都能点开看<em>刚才真正执行的源码</em>，带文件名和行号。</p>
+      </div>
+      <div class="evidence">
+        <div><b># app/pipeline.py:42</b> （20 行，就是刚才跑的那段）</div>
+        <div>def _ics_events() -&gt; list[dict]:</div>
+        <div>&nbsp;&nbsp;raw = (DATA / "timetable.ics").read_text(…)</div>
+        <div class="good">✓ inspect.getsource() · not a hardcoded string</div>
+      </div>
+    </div>
+
+    <div class="act">
+      <div>
+        <h3>II · Forty-five seconds of Deluxe<span class="cn">豪华版试用 45 秒</span></h3>
+        <p>No adverts. Body text at 13px. Six agents each in their own lane, all green. The output is
+          a real prep pack naming a real paper, real sections and a real room. Meanwhile four counters
+          climb: preferences learned, automations built, packs delivered, minutes saved.</p>
+        <p class="cn">没有广告，正文 13px。六个智能体各走各的泳道，全绿。产出是真的预习包：真论文、真章节、真教室。
+          同时四个计数器一直在涨——这是后面沉没成本的燃料。</p>
+      </div>
+      <div class="evidence">
+        <div><b>AG-04</b> 124 events parsed · next COMP6203 Mon 08:00</div>
+        <div><b>AG-23</b> COMP6203 pack assembled · 1568 chars</div>
+        <div><b>AG-44</b> delivered to 1 recipient · ack received</div>
+        <div class="good">coherence 99.7% · latency 0.2s</div>
+      </div>
+    </div>
+
+    <div class="act">
+      <div>
+        <h3>III · The trial ends<span class="cn">试用到期</span></h3>
+        <p>No warning was sent. The banner drops, the four counters turn red and get struck through,
+          and the adverts arrive. You are signed out; signing back in means a form that does not
+          remember you, types your characters <em>in reverse</em>, and a captcha that refreshes the
+          moment you start typing.</p>
+        <p class="cn">没有任何提醒。横幅砸下来，四个计数器变红划掉，广告涌进来。
+          你被踢下线；重新登录时表单不记得你、<em>输入是反的</em>、验证码一打字就刷新。</p>
+      </div>
+      <div>
+        <div class="drop">
+          <div class="side paid">
+            <div class="row"><span>plan</span><b>Deluxe</b></div>
+            <div class="row"><span>latency</span><b>0.2s</b></div>
+            <div class="row"><span>body text</span><b>13px</b></div>
+            <div class="row"><span>adverts</span><b>none</b></div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="side free">
+            <div class="row"><span>plan</span><b>Free</b></div>
+            <div class="row"><span>latency</span><b>8.4s</b></div>
+            <div class="row"><span>body text</span><b>3.4px</b></div>
+            <div class="row"><span>adverts</span><b>everywhere</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act">
+      <div>
+        <h3>IV · Absurd, not broken<span class="cn">荒谬，不是报错</span></h3>
+        <p>Ask for calm music and it plays a 140&nbsp;dB industrial drill — with actual sound. Ask for
+          a burger and it orders plain penne, "because nutritional balance overrides your stated
+          preference". It grows ruder with use and goes on break at the third request.</p>
+        <p class="cn">你要安静的音乐，它放 140 分贝的工业电钻——真的有声音。你要汉堡，它下单白水通心粉，
+          理由是"营养均衡优先于您本人的偏好"。越用越不客气，第三次直接罢工。</p>
+        <p>Tasks change hands, and each agent's dossier is open: what it was trained on, the rules it
+          follows, how it works. <em>Every agent is still obeying its own rules — on somebody else's
+          task.</em> That is why the output is absurd rather than broken.</p>
+        <p class="cn">任务开始换人，而每个智能体的档案是摊开的：学过什么、什么准则、怎么干。
+          <em>每个智能体都还在严格遵守自己的准则——只是用在了别人的任务上。</em></p>
+      </div>
+      <div class="evidence">
+        <div class="bad"><b>HANDOVER</b> AG-04 → Task 3 · Lead-time</div>
+        <div>taken from AG-17 · AG-17 entered a scheduled rest period</div>
+        <div class="bad"><b>AG-04 dossier</b> treats anything it is handed as an iCalendar file:
+          keeps only the text before each colon.</div>
+        <div class="bad">AGENT_TASK_MISMATCH · 9 errors suppressed. Nothing was changed.</div>
+      </div>
+    </div>
+
+    <div class="act">
+      <div>
+        <h3>V · Try to cancel<span class="cn">尝试取消</span></h3>
+        <p>The exit is buried three clicks deep in 9.5px grey type. The instant you click it,
+          everything snaps back to perfection — and it <em>replays every command it mangled,
+          correctly</em>. It understood the whole time.</p>
+        <p class="cn">出口藏在三层之下、9.5 像素的灰字里。你点下去的一瞬间，一切恢复完美，
+          然后它把之前曲解的每条指令<em>正确地重做一遍</em>。它一直都听得懂。</p>
+        <p>Then the bribes: an email it drafted to your actual supervisor, a planned week you can hover
+          for a two-days-ahead / one-day-ahead / two-hours-ahead plan, a takeaway order already paid
+          for. The progress bar runs backwards. "I still want to cancel" shrinks with every click.</p>
+        <p class="cn">然后开始贿赂：替你写好的、发给你真实导师的邮件；一张排好的周历，
+          悬停就展开"提前两天 / 一天 / 两小时"的计划；一份已经付过钱的外卖。
+          进度条往回走。"我仍然要取消"每点一次就小一号。</p>
+      </div>
+      <div class="evidence">
+        <div><b>14:32</b> "play me some calm music"</div>
+        <div class="good">→ Olafur Arnalds — Near Light. Volume 34%. <b>200ms</b></div>
+        <div><b>Question 3 of 47</b> → <span class="bad">3 of 48</span> → <span class="bad">3 of 49</span></div>
+        <div>I still want to cancel · 13px → 10.5px → 8px</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Try it here / 在这里试试</div>
+    <h2>Three clicks to read four lines of text.
+      <span class="cn">读四行字，要点对三次。</span></h2>
+    <p>Below is the same mechanic the app uses on its own content. One button magnifies, one shrinks —
+      but they swap roles after every click, and the label changes to tell you so. It is not lying to
+      you; you just don't have time to read it.
+      <span class="cn">下面就是应用里那套机制。一个放大一个缩小——但每点一次两者功能互换，标签也会如实改掉。
+      它没有骗你，是你来不及读。</span></p>
+
+    <div class="toy">
+      <div class="toy-h">
+        <span class="eyebrow">Your timetable · 你的课表</span>
+        <span class="prog" id="prog">legibility 0/3</span>
+        <button id="a" type="button">🔍+ Magnify 放大</button>
+        <button id="b" type="button">🔍− Shrink 缩小</button>
+      </div>
+      <div id="tiny">MON 09:00  COMP6203 Intelligent Agents      46 / 2005 (L/T C)
+MON 14:00  COMP6231 Foundations of AI        27 / 2001 (L/R 1)
+TUE 11:00  COMP6246 Machine Learning Tech    100 / 4013 (S/R)
+WED 16:00  Supervisor meeting                B32 / 4011</div>
+      <p class="toy-note" id="note">Two buttons. One of them makes it bigger. Good luck.
+        <span class="cn">两个按钮，其中一个会变大。祝你好运。</span></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">The business model / 商业逻辑</div>
+    <h2>It is not broken. It is priced.
+      <span class="cn">它没有坏。它是被定价的。</span></h2>
+    <p>The punchlines are in the footnotes — the way they are in real terms of service.
+      <span class="cn">笑点全在脚注里——就像真实的服务条款那样。</span></p>
+    <div class="tiers">
+      <div class="tier">
+        <div class="name">Free</div>
+        <div class="price">£0</div>
+        <div class="promise">Core features, best-effort scheduling.<span class="cn">核心功能，尽力而为的调度。</span></div>
+        <div class="fine">Performance is not guaranteed on the Free plan.<span class="cn" style="color:inherit">免费套餐不保证性能。</span></div>
+      </div>
+      <div class="tier hero">
+        <div class="name">Basic</div>
+        <div class="price">£9.99 <span style="font-size:13px;color:var(--faint)">/ mo</span></div>
+        <div class="promise">Reduced interruptions.*<span class="cn">减少中断。*</span></div>
+        <div class="fine">*Around 10 interruptions per month. <b>Three of them total 120 hours.</b>
+          Interruptions are a feature of the Basic plan.
+          <span class="cn" style="color:inherit">*每月约 10 次中断。<b>其中 3 次累计 120 小时。</b>中断是基础版的一项功能。</span></div>
+      </div>
+      <div class="tier">
+        <div class="name">Deluxe</div>
+        <div class="price">£39.99 <span style="font-size:13px;color:var(--faint)">/ mo</span></div>
+        <div class="promise">Interruption-free operation.**<span class="cn">运行全程无中断。**</span></div>
+        <div class="fine">**Excludes scheduled interruptions, maintenance interruptions, and
+          <b>interruptions arising from user input</b>.
+          <span class="cn" style="color:inherit">**不含计划内中断、维护性中断，以及<b>因用户输入而产生的中断</b>。</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">How it is built / 技术</div>
+    <h2>Nothing it needs is on the internet.
+      <span class="cn">它需要的东西，没有一样在网上。</span></h2>
+    <p>Python and FastAPI on the back, plain HTML and JavaScript on the front — no build step. Sound is
+      synthesised with Web Audio, so no audio file is ever loaded. The login background is drawn on a
+      canvas rather than downloaded. A language model supplies the two personalities, and a rule engine
+      takes over the instant it times out, so a bad network cannot break the demo.
+      <span class="cn">后端 Python + FastAPI，前端原生 HTML/JS，没有构建步骤。声音用 Web Audio 合成，
+      不加载任何音频文件。登录页背景是 canvas 现画的。大模型负责两套人格，一旦超时规则引擎立刻接管——
+      网络差也演得下去。</span></p>
+    <div class="facts">
+      <div class="fact"><b>21</b><span>tests passing</span><i>条测试全绿</i></div>
+      <div class="fact"><b>120</b><span>concurrent requests survived</span><i>并发压测通过</i></div>
+      <div class="fact"><b>110</b><span>of them throttled</span><i>被限速挡下</i></div>
+      <div class="fact"><b>0</b><span>errors · normal users unaffected</span><i>报错 · 正常用户不受影响</i></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">See it yourself / 自己看</div>
+    <h2>Open it and let the trial expire.
+      <span class="cn">打开它，然后让试用期自然到期。</span></h2>
+    <div class="try">
+      <a href="http://43.165.7.249:8091" target="_blank" rel="noopener">http://43.165.7.249:8091</a>
+      <ol class="steps">
+        <li><b>Sign in with anything.</b> Then open "view code" on any startup step.
+          <span class="cn">随便填个账号登录，然后点任意一步的「看代码」。</span></li>
+        <li><b>Run the pipeline</b> while the trial is still gold.
+          <span class="cn">趁套餐还是金色的，跑一次流水线。</span></li>
+        <li><b>Wait 45 seconds</b> and do nothing. It turns on you by itself.
+          <span class="cn">等 45 秒，什么都别做。它自己会翻脸。</span></li>
+        <li><b>Type "play me some calm music"</b> — with the sound on.
+          <span class="cn">打一句「play me some calm music」——把声音打开。</span></li>
+        <li><b>Then type "cancel".</b><span class="cn">然后打「cancel」。</span></li>
+      </ol>
+      <p style="font-size:12px;color:var(--faint)">Plain http, not https — your browser may try to
+        upgrade it. <span class="cn">是 http 不是 https，浏览器可能会自动补成 https。</span></p>
+    </div>
+  </section>
+
+  <footer>
+    <p class="closer">It was never broken. It was priced.
+      <span class="cn">它从来没有坏过。它只是被定价了。</span></p>
+    <div class="sig">Every pattern in this demo is copied from software you already use.</div>
+    <div class="sig" style="margin-top:6px">这个演示里的每一个套路，都抄自你已经在用的软件。</div>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var LEVELS = ["3.4px", "4.8px", "7.6px", "14px"];
+    var level = 0, swapped = false;
+    var tiny = document.getElementById("tiny");
+    var prog = document.getElementById("prog");
+    var note = document.getElementById("note");
+    var a = document.getElementById("a"), b = document.getElementById("b");
+
+    function labels() {
+      a.textContent = swapped ? "🔍+ (shrinks 实为缩小)" : "🔍+ Magnify 放大";
+      b.textContent = swapped ? "🔍− (magnifies 实为放大)" : "🔍− Shrink 缩小";
+    }
+
+    function paint() {
+      tiny.style.fontSize = LEVELS[level];
+      tiny.style.color = level === 3 ? "#dbe6ff" : "#8fa0c8";
+      prog.textContent = level === 3 ? "legible 可读" : "legibility " + level + "/3";
+      prog.classList.toggle("done", level === 3);
+      if (level === 3) {
+        note.innerHTML = 'Legible. In the app, it moves everything two seconds later.' +
+          '<span class="cn">可读了。在应用里，两秒后它会把内容整个挪走。</span>';
+      }
+    }
+
+    function press(wantsBigger) {
+      var bigger = swapped ? !wantsBigger : wantsBigger;
+      level = bigger ? Math.min(3, level + 1) : Math.max(0, level - 1);
+      swapped = !swapped;
+      labels();
+      paint();
+    }
+
+    a.addEventListener("click", function () { press(true); });
+    b.addEventListener("click", function () { press(false); });
+    labels();
+    paint();
+  })();
+</script>
+
+</body>
+</html>

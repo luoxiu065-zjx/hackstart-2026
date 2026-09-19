@@ -202,6 +202,12 @@ def source(stage: str):
     return src or {"error": "unknown stage", "stage": stage}
 
 
+@app.get("/about")
+def about():
+    """对外介绍页。评委和同学打不开 claude.ai，所以挂在自己的服务器上。"""
+    return FileResponse(STATIC / "about.html")
+
+
 @app.get("/")
 def index():
     return FileResponse(STATIC / "index.html")
