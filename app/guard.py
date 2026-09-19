@@ -13,11 +13,14 @@
 """
 from __future__ import annotations
 
+import os
 import time
 from collections import defaultdict, deque
 from threading import Lock
 
-OPEN_MINUTES = 60          # 站点存活时间：一小时
+# 站点存活时间。默认一小时；比赛当天用环境变量开到覆盖整场的时长。
+#   ORCHESTRA_OPEN_MINUTES=480  ./run
+OPEN_MINUTES = float(os.environ.get("ORCHESTRA_OPEN_MINUTES", "60"))
 
 # 限速分两档。压测时发现两个真问题，这里都改掉了：
 #   ① 原来按 IP 限速——评委在同一个会场 wifi 下共用出口 IP，会被一起锁死。
