@@ -12,12 +12,22 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from app import billing, inverse, pipeline
+from app import billing, hub, inverse, pipeline, retention, transparency
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "static"
 
 app = FastAPI(title="ORCHESTRA")
+
+
+@app.middleware("http")
+async def no_cache(request, call_next):
+    """演示当天最怕的事：评委面前一刷新，浏览器给的是缓存里的旧样式。
+    这里一律 no-store，改完刷新就一定是新的。"""
+    resp = await call_next(request)
+    resp.headers["Cache-Control"] = "no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    return resp
 
 
 class Command(BaseModel):
@@ -83,14 +93,35 @@ def command(c: Command):
     return {"reply": en, "reply_cn": cn, "sound": inverse.sound_for(c.text)}
 
 
-# ---------------------------------------------------------------------------
-# TODO(George): 取消订阅 / 挽留流程
-#   POST /api/cancel  ->  {"replay":[...], "survey":[...]}
-#   前端监听 window 的 "orchestra:cancel" 事件，渲染进 #billing-slot
-# ---------------------------------------------------------------------------
+class CancelReq(BaseModel):
+    history: list[dict] = []
+
+
 @app.post("/api/cancel")
-def cancel():
-    return {"replay": [], "survey": [], "todo": "George"}
+def cancel(req: CancelReq):
+    """取消意向一出现，它立刻变成完美的自己。"""
+    billing.ACCOUNT.upgrade("pro")          # 性能瞬间恢复——证明它一直做得到
+    return {
+        "replay": retention.replay(req.history),
+        "survey": retention.survey(),
+        "finale": retention.FINALE,
+        "live_work": retention.live_work(),
+        "account": billing.ACCOUNT.snapshot(),
+    }
+
+
+# ---------------------------------------------------------------------------
+# 透明层：开场清单 + 每个阶段的真实源码
+# ---------------------------------------------------------------------------
+@app.get("/api/manifest")
+def manifest():
+    return {"steps": transparency.manifest()}
+
+
+@app.get("/api/source")
+def source(stage: str):
+    src = transparency.source_of(stage)
+    return src or {"error": "unknown stage", "stage": stage}
 
 
 @app.get("/")

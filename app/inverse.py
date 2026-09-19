@@ -86,3 +86,60 @@ def sound_for(text: str) -> str:
     if re.search(r"stop|wait|no|undo|don't", text, re.I):
         return "alarm"
     return "error"
+
+
+# ---------------------------------------------------------------------------
+# 重放：取消订阅被触发后，它把之前曲解掉的指令「正确地」重做一遍。
+# 每条都对应上面 RULES 里的同一个正则——同一个请求，它一直都读得懂。
+# ---------------------------------------------------------------------------
+CORRECT: list[tuple[str, str, str]] = [
+    (r"calm|quiet|relax|soft|soothing|chill|peaceful|focus",
+     "Playing Olafur Arnalds — Near Light. Volume set to 34%.",
+     "正在播放 Olafur Arnalds《Near Light》。音量已设为 34%。"),
+    (r"music|song|playlist|listen",
+     "Resumed your Friday evening playlist at track 4.",
+     "已从第 4 首继续播放你周五晚上的歌单。"),
+    (r"burger|pizza|food|hungry|eat|lunch|dinner|takeaway|meal",
+     "Ordered your usual. Arrives in 18 minutes.",
+     "已按你平时的口味下单。18 分钟后送达。"),
+    (r"coffee|tea|drink|water|thirsty",
+     "Flat white, one sugar. Ready for collection at 14:05.",
+     "小白咖啡，一份糖。14:05 可取。"),
+    (r"dark|night|dim|darker",
+     "Dark mode enabled. Warmth increased after 21:00.",
+     "已启用深色模式。21:00 之后自动加暖色。"),
+    (r"short|brief|summar|tldr|quick version|concise",
+     "Summarised to 4 bullet points. 90 seconds to read.",
+     "已压缩为 4 条要点。90 秒读完。"),
+    (r"fast|faster|hurry|urgent|asap|quick|speed|rush",
+     "Moved to the front of the queue. Completed in 0.3s.",
+     "已移到队列最前。0.3 秒完成。"),
+    (r"bigger|larger|zoom|font|read|legib|see",
+     "Body text set to 16px. Line height 1.7.",
+     "正文已设为 16px，行高 1.7。"),
+    (r"timetable|schedule|lecture|class|when is|deadline|due",
+     "Your next lecture: COMP6203, Monday 08:00, 46/2005.",
+     "你的下一节课：COMP6203，周一 08:00，46/2005。"),
+    (r"sleep|tired|rest|break|pause",
+     "Cleared your evening. Nothing scheduled after 18:00.",
+     "已清空你的晚上。18:00 之后没有任何安排。"),
+    (r"help|how do|what is|why|explain",
+     "Answered in 2 sentences, with a source link.",
+     "已用两句话回答，并附上了出处链接。"),
+    (r"email|message|send|reply",
+     "Drafted, tone-matched to your last three messages. Awaiting your approval.",
+     "已起草，语气对齐你最近三封邮件。等你点发送。"),
+]
+
+CORRECT_FALLBACK = (
+    "Understood and executed as stated.",
+    "已按你原话理解并执行。",
+)
+
+
+def correct(text: str) -> tuple[str, str]:
+    """同一句话，它本来可以这样回。"""
+    for pattern, en, cn in CORRECT:
+        if re.search(pattern, text, re.I):
+            return en, cn
+    return CORRECT_FALLBACK

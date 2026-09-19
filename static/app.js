@@ -94,6 +94,7 @@ async function refreshState() {
     : account.price;
   document.body.dataset.tier = account.tier;
   renderAssets(account.assets);
+  if (window.setHostile) setHostile(account.tier === "free" || account.tampered);
 
   if (account.just_expired) {
     log("Trial ended. Reverting to Free plan. No reminder was sent.",
@@ -354,3 +355,28 @@ renderStatic();
 refreshState();
 log("Fleet online. 80 agents. Autonomy engaged.", "集群上线。80 个智能体。自治已开启。", "ok");
 log("Free trial active — unrestricted performance.", "免费试用中 —— 性能不受限制。", "ok");
+
+
+/* ================= 藏三层的取消入口：设置 → 账单 → 灰色小字 ================= */
+$("#to-billing").onclick = () => {
+  $("#billing-slot").innerHTML = `
+    <div class="billing">
+      <div class="bill-h">${bi("Billing", "账单")}</div>
+      <div class="srow">${bi("Current plan", "当前套餐")}
+        <span class="sval">${account ? account.tier_name : "—"}</span></div>
+      <div class="srow">${bi("Next charge", "下次扣费")}
+        <span class="sval">${bi("in 27 days", "27 天后")}</span></div>
+      <div class="srow">${bi("Payment method", "支付方式")}
+        <span class="sval">•••• 4417</span></div>
+      <div class="srow">${bi("Invoices", "发票")}
+        <span class="sval">${bi("Request by post", "请来函索取")}</span></div>
+      <div class="bill-foot">
+        <span id="cancel-link">${bi("Cancel subscription", "取消订阅")}</span>
+      </div>
+    </div>`;
+  $("#cancel-link").onclick = () => {
+    log("Cancellation intent detected. Handing off to retention…",
+        "检测到取消意向。正在移交挽留流程…", "ok");
+    window.dispatchEvent(new CustomEvent("orchestra:cancel", { detail: { history, account } }));
+  };
+};

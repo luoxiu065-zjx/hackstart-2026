@@ -224,3 +224,155 @@ body.lost .asset-n{color:var(--red);text-decoration:line-through}
 
 /* hidden 属性必须能压住 display:flex，否则关不掉 */
 .modal[hidden]{display:none}
+
+/* ======================= 挽留流程：从混乱切到纯白企业风 ======================= */
+.ret{position:fixed;inset:0;z-index:80;background:#fbfbfd;color:#10131c;
+     font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+     display:flex;flex-direction:column;opacity:0;transition:opacity .45s ease}
+.ret.in{opacity:1}
+.ret-top{display:flex;align-items:center;justify-content:space-between;
+         padding:20px 40px;border-bottom:1px solid #e6e8ef;background:#fff}
+.ret-who{font-size:17px;font-weight:700;letter-spacing:-.2px}
+.ret-sub{font-size:12px;color:#6b7386;margin-top:3px}
+.ret-badge{font-size:10.5px;letter-spacing:1.4px;font-weight:700;color:#0c5c4a;
+           background:#dcf5ec;border-radius:99px;padding:6px 14px}
+.ret-body{flex:1;overflow-y:auto;padding:34px 40px 60px;max-width:900px;
+          width:100%;margin:0 auto}
+.ret-sec{opacity:0;transform:translateY(10px);transition:.45s ease;margin-bottom:30px}
+.ret-sec.in{opacity:1;transform:none}
+.ret-sec h3{font-size:19px;font-weight:600;letter-spacing:-.3px;margin-bottom:18px}
+.ret .cn{color:#7a8296;font-size:.9em}
+.ret-p{font-size:14px;line-height:1.8;color:#4a5164;max-width:620px;margin-bottom:20px}
+
+/* 重放 */
+.rp{display:grid;grid-template-columns:52px 1fr 1fr 64px;gap:14px;align-items:baseline;
+    padding:11px 0;border-bottom:1px solid #eef0f5;font-size:13px;
+    opacity:0;transform:translateX(-6px);transition:.3s ease}
+.rp.in{opacity:1;transform:none}
+.rp-t{color:#9aa1b4;font-size:11.5px;font-variant-numeric:tabular-nums}
+.rp-q{color:#6b7386}
+.rp-a{color:#0c5c4a;font-weight:600}
+.rp-ms{color:#9aa1b4;font-size:11.5px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* 问卷卡 */
+.q-head{display:flex;align-items:center;gap:16px;font-size:11.5px;color:#6b7386;margin-bottom:14px}
+.q-bar{flex:1;max-width:260px;height:5px;background:#e8eaf1;border-radius:99px;overflow:hidden}
+.q-bar i{display:block;height:100%;background:#2f6bff;transition:width .6s ease}
+.q-body{font-size:21px;line-height:1.55;font-weight:600;letter-spacing:-.3px;
+        max-width:680px;margin-bottom:12px}
+.q-proof{font-size:12.5px;line-height:1.75;color:#7a8296;background:#f2f4f9;
+         border-left:3px solid #ccd3e4;border-radius:0 8px 8px 0;
+         padding:11px 14px;max-width:680px;margin-bottom:22px}
+.q-actions{display:flex;gap:12px;align-items:center}
+.q-keep{background:#2f6bff;color:#fff;border:none;border-radius:9px;padding:13px 26px;
+        font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.q-keep.ghost{background:none;color:#6b7386;border:1px solid #d5dae6}
+.q-skip{background:none;border:1px solid #d5dae6;color:#6b7386;border-radius:9px;
+        padding:12px 18px;font:inherit;font-size:12.5px;cursor:pointer}
+.q-exit-wrap{margin-top:26px}
+.q-exit{color:#aeb4c4;cursor:pointer;text-decoration:underline;
+        transition:font-size .3s ease}
+.q-exit:hover{color:#8b92a6}
+
+/* 结局 */
+.ret.dead{background:#0a0b0f;color:#7a8296;transition:background .9s ease,color .9s ease}
+.ret.dead .ret-top{background:#0d0f15;border-color:#1a1d27}
+.ret.dead .ret-who{color:#4e5468}
+.ret.dead .ret-badge{background:#161923;color:#4e5468}
+.fin{padding-top:60px;text-align:center}
+.fin-x{font-size:12px;letter-spacing:3px;color:#5a6076;margin-bottom:34px}
+.fin-line{font-size:34px;font-weight:700;line-height:1.35;color:#e8ebf4;
+          letter-spacing:-.6px;max-width:720px;margin:0 auto 22px}
+.fin-line .cn{color:#8b92a6;font-size:.62em;margin-top:12px}
+.fin-sub{font-size:13.5px;line-height:1.85;color:#6b7386;max-width:560px;margin:0 auto 34px}
+.fin-sub .cn{color:#565c70}
+
+
+/* 账单页：取消链接故意做成最不起眼的那一行 */
+.billing{max-width:560px;margin-top:26px;border-top:1px solid var(--line);padding-top:18px}
+.bill-h{font-size:11px;letter-spacing:2px;color:var(--dim);margin-bottom:12px}
+.bill-foot{margin-top:22px}
+#cancel-link{font-size:9.5px;color:#3c4a6e;cursor:pointer;text-decoration:underline}
+#cancel-link:hover{color:var(--dim)}
+
+/* ======================= 开场：登录 + 透明启动 ======================= */
+.ob{position:fixed;inset:0;z-index:90;background:#070a12;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;transition:opacity .4s ease}
+.ob.in{opacity:1}
+.ob-box{width:min(720px,calc(100% - 48px));background:var(--panel);
+        border:1px solid var(--line);border-radius:16px;padding:34px 36px}
+.ob-logo{font-size:16px;font-weight:700;letter-spacing:3px;margin-bottom:26px}
+.ob-logo span{color:var(--cyan);margin-left:4px}
+.ob-h{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:22px}
+.ob-l{display:block;font-size:10.5px;letter-spacing:1.3px;color:var(--dim);margin-bottom:6px}
+.ob input{width:100%;background:#0b1120;border:1px solid var(--line);border-radius:9px;
+          padding:12px 14px;color:var(--text);font:inherit;font-size:14px;outline:none;
+          margin-bottom:16px}
+.ob input:focus{border-color:var(--cyan)}
+.ob-note{font-size:11.5px;color:var(--dim);line-height:1.7;margin-bottom:22px}
+.ob button{background:var(--cyan);color:#05221d;border:none;border-radius:9px;
+           padding:13px 30px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.ob-tiny{font-size:11px;color:#4a5878;margin-top:16px;cursor:pointer;text-decoration:underline}
+.ob-why-body{font-size:11.5px;color:var(--dim);line-height:1.75;margin-top:10px;
+             border-left:2px solid var(--line);padding-left:12px}
+.ob-who{font-size:12px;color:var(--dim);line-height:1.7;margin-bottom:20px}
+.ob-who b{color:var(--text)}
+
+.ob-steps{display:flex;flex-direction:column;gap:2px;margin-bottom:18px}
+.ob-row{display:grid;grid-template-columns:20px 1fr auto auto;gap:14px;align-items:baseline;
+        padding:9px 0;border-bottom:1px solid #141c2f;font-size:12.5px;
+        opacity:0;transform:translateX(-6px);transition:.28s ease}
+.ob-row.in{opacity:1;transform:none}
+.ob-tick{color:var(--cyan)}
+.ob-what{color:var(--text)}
+.ob-src{color:#4a5878;font-size:11px}
+.ob-view{color:var(--cyan);font-size:11px;cursor:pointer;text-decoration:underline;
+         white-space:nowrap}
+.ob-code{background:#0a0f1c;border:1px solid var(--line);border-radius:9px;padding:14px;
+         font-size:11px;line-height:1.7;color:#9fe8ff;max-height:240px;overflow:auto;
+         white-space:pre;margin-bottom:18px}
+
+
+/* 挽留过程中常驻的「我还在替你干活」 */
+.ret-live{display:flex;align-items:center;gap:12px;padding:13px 40px;
+          border-top:1px solid #e6e8ef;background:#fff;font-size:12px;color:#6b7386}
+.rl-dot{width:7px;height:7px;border-radius:50%;background:#12b886;
+        box-shadow:0 0 0 0 rgba(18,184,134,.55);animation:pulse 1.9s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(18,184,134,0)}
+                 100%{box-shadow:0 0 0 0 rgba(18,184,134,0)}}
+.rl-label{font-weight:700;color:#0c5c4a;letter-spacing:.2px}
+.rl-label .cn{display:inline;margin-left:6px;color:#7a8296;font-weight:400}
+.rl-item{color:#4a5164;transition:opacity .26s ease}
+.rl-item .cn{display:inline;margin-left:8px}
+
+/* ======================= 仪表盘：干净 → 敌意 ======================= */
+/* 试用期：正文本来就能读，重点清晰 */
+.micro{font-size:13px;line-height:1.75;color:#b9c6e6;transition:font-size .6s ease}
+.card.tiny:hover .micro{font-size:13px}
+.card.tiny:hover .card-h::after{content:""}
+
+/* 掉档后：缩到看不见 */
+body.hostile .micro{font-size:3.4px;line-height:1.5;color:#8fa0c8}
+body.hostile .card.tiny:hover .micro{font-size:2.6px}
+body.hostile .card.tiny:hover .card-h::after{content:"  ⟲ optimising legibility…";color:var(--amber)}
+/* 放大镜开着的时候，确实看得清——但只有一小会儿 */
+body.hostile.lens .micro{font-size:14px;color:#dbe6ff}
+body.hostile.lens .card.tiny:hover .micro{font-size:14px}
+
+/* 换位置时的动画：你眼睁睁看着它挪走 */
+.grid > *{transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.moved{animation:nudge .5s ease}
+@keyframes nudge{0%{transform:translateY(8px) scale(.985);opacity:.55}
+                 100%{transform:none;opacity:1}}
+.promo.added{animation:nudge .5s ease}
+
+/* 放大镜工具条 */
+.lensbar{display:flex;align-items:center;gap:14px;margin-bottom:14px;
+         font-size:11.5px;color:var(--dim)}
+.lensbar button{background:#1a2237;border:1px solid var(--line);
+                color:var(--text);border-radius:8px;padding:7px 14px;font:inherit;
+                font-size:12px;cursor:pointer}
+.lensbar button:hover{border-color:var(--cyan)}
+.lens-t{font-variant-numeric:tabular-nums}
+.lens-warn{color:var(--amber)}

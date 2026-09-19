@@ -68,14 +68,22 @@
 
   <!-- ============ DASHBOARD ============ -->
   <section id="view-dashboard" class="view">
+    <div id="promos" hidden>
     <div class="promo promo-a">
       <div class="promo-tag">LIMITED TIME</div>
       <div class="promo-big">50% OFF</div>
       <div class="promo-sub">ORCHESTRA PRO — upgrade now and unlock 40 more agents you will never use</div>
       <button class="promo-x" title="Close">×</button>
     </div>
+    </div>
 
-    <div class="grid">
+    <div class="lensbar" id="lensbar" hidden>
+      <span class="lens-t" id="lens-t"></span>
+      <button id="lens-on">🔍 <span id="lens-label"></span></button>
+      <span class="lens-warn" id="lens-warn"></span>
+    </div>
+
+    <div class="grid" id="grid">
       <div class="card tiny">
         <div class="card-h" data-i="card.timetable">YOUR TIMETABLE</div>
         <div class="micro" id="timetable"></div>
@@ -84,18 +92,9 @@
         <div class="card-h" data-i="card.research">SUPERVISOR RESEARCH INTERESTS</div>
         <div class="micro" id="research"></div>
       </div>
-      <div class="promo promo-b">
-        <div class="promo-big2">🎁 REFER A FRIEND</div>
-        <div class="promo-sub">Both of you get 3 months of a feature we are deprecating in October</div>
-      </div>
       <div class="card tiny">
         <div class="card-h" data-i="card.deadlines">COURSEWORK DEADLINES</div>
         <div class="micro" id="deadlines"></div>
-      </div>
-      <div class="promo promo-c">
-        <div class="promo-marquee">
-          <span>★ NEW: AGENTS CAN NOW SEND EMOJI ★ NEW: DARK MODE (BETA, BREAKS EVERYTHING) ★ NEW: AGENTS CAN NOW SEND EMOJI ★</span>
-        </div>
       </div>
     </div>
   </section>
@@ -165,5 +164,8 @@
 <script src="audio.js"></script>
 <script src="i18n.js"></script>
 <script src="app.js"></script>
+<script src="retention.js"></script>
+<script src="hostile.js"></script>
+<script src="onboard.js"></script>
 </body>
 </html>
