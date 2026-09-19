@@ -122,6 +122,16 @@ const SHELL = [
 
 /* ---- 智能体 ↔ 任务 分配表：用流水线的真实改派结果填 ---- */
 function renderAssign(stages) {
+  if (window.renderLanes) renderLanes(stages);
+  const h = $("#lanes-hint");
+  if (h) {
+    const bad = (stages || []).filter(s => s.actually_did !== s.assigned_to).length;
+    h.innerHTML = bad
+      ? bi(`${bad} of 6 agents are executing a task that was not assigned to them. The curved lines show where the work actually went.`,
+           `6 个智能体里有 ${bad} 个正在执行不属于自己的任务。弯曲的那几条线，就是活儿实际跑去的地方。`)
+      : bi("Each agent stays in its own lane. The dot marks the stage it reached.",
+           "每个智能体走自己的泳道。那个点标出它做到了哪一步。");
+  }
   const rows = stages || SHELL.map(([ag, en, cn]) => ({
     agent: ag, assigned_to: en, name_cn: cn, actually_did: en, actually_did_cn: cn, ok: true,
   }));

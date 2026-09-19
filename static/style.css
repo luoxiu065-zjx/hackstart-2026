@@ -877,3 +877,26 @@ body.hostile #deluxe{display:none}
 .pr-tip{margin-top:7px;padding-top:7px;border-top:1px dashed #dfe3ec}
 .pr-step{font-size:10.5px;line-height:1.7;color:#6b7386;padding:2px 0}
 .pr-step::before{content:"› ";color:#b6bbc9}
+
+/* ---------- 泳道图：每个 agent 一条线，一个点 ---------- */
+.lanes{margin-bottom:10px}
+.ln{width:100%;height:auto}
+.ln-step{fill:#4d5a7d;font-size:9px;letter-spacing:1.6px;text-anchor:middle}
+.ln-grid{stroke:rgba(255,255,255,.045);stroke-width:1}
+.ln-agent{fill:#8a97b8;font-size:11px;letter-spacing:1px}
+.ln-track{stroke:rgba(255,255,255,.09);stroke-width:1.4}
+.ln-done{stroke-width:2.4;stroke-linecap:round}
+.ln-done.ok{stroke:rgba(61,220,151,.75)}
+.ln-done.bad{stroke:rgba(255,77,109,.75)}
+.ln-jump{fill:none;stroke:#ff4d6d;stroke-width:1.6;stroke-dasharray:5 4;opacity:.85}
+.ln-jump-t{fill:#ff8ba3;font-size:9px;text-anchor:middle;letter-spacing:.8px}
+.ln-halo{fill:rgba(61,220,151,.16)}
+.ln-mark.bad .ln-halo{fill:rgba(255,77,109,.18)}
+.ln-dot{fill:#3ddc97}
+.ln-mark.bad .ln-dot{fill:#ff4d6d}
+.ln-doing{fill:#e8e6ef;font-size:11px;font-family:"Noto Sans SC",system-ui,sans-serif}
+.ln-detail{fill:#5f5d73;font-size:9.5px}
+.ln-idle{fill:#3f4d70;font-size:9.5px}
+.lanes-hint{font-size:11.5px;line-height:1.8;color:#6d7ca4;margin-bottom:22px;
+            padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.lanes-hint .cn{color:#5f5d73}
