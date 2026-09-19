@@ -17,7 +17,7 @@ SCRATCH = pathlib.Path(
     r"C:\Users\luoxi\AppData\Local\Temp\claude"
     r"\C--Users-luoxi-Desktop\7a049107-9077-4501-8c20-950111cb6bfd\scratchpad")
 FRAMES = SCRATCH / "frames-en"
-OUT = pathlib.Path(r"C:\Users\luoxi\Desktop\claude图片文档专用\文档\ORCHESTRA-Pitch-EN.pptx")
+OUT = pathlib.Path(r"C:\Users\luoxi\Desktop\claude图片文档专用\文档\ORCHESTRA-Pitch-EN-v2.pptx")
 
 INK = RGBColor(0x0B, 0x0C, 0x13)
 PANEL = RGBColor(0x14, 0x15, 0x1F)
@@ -113,6 +113,38 @@ def stat_row(slide, y, items):
               (label, 11, FAINT, False, MONO, 6)])
 
 
+
+def bar(slide, x, y, w, h, frac, color, label, value, sub=None):
+    """一根横条 + 数值。frac 是占满宽度的比例（0-1）。"""
+    track = slide.shapes.add_shape(1, x, y, w, h)
+    track.fill.solid(); track.fill.fore_color.rgb = RGBColor(0x1C, 0x1D, 0x29)
+    track.line.fill.background(); track.shadow.inherit = False
+    fill_w = max(int(w * frac), Inches(0.06))
+    fg = slide.shapes.add_shape(1, x, y, fill_w, h)
+    fg.fill.solid(); fg.fill.fore_color.rgb = color
+    fg.line.fill.background(); fg.shadow.inherit = False
+    text(slide, x, y - Inches(0.34), w, Inches(0.3),
+         [(label, 12, DIM, False, BODY, 0)])
+    text(slide, x + w + Inches(0.18), y - Inches(0.12), Inches(2.2), Inches(0.5),
+         [(value, 19, color, False, DISPLAY, 0)])
+    if sub:
+        text(slide, x + w + Inches(0.18), y + Inches(0.26), Inches(2.4), Inches(0.3),
+             [(sub, 10, FAINT, False, MONO, 0)])
+
+
+def column(slide, x, y, w, head, items, accent):
+    """总结页的一栏。"""
+    text(slide, x, y, w, Inches(0.4), [(head.upper(), 11, accent, False, MONO, 0)])
+    line = slide.shapes.add_shape(1, x, y + Inches(0.34), w, Emu(9525))
+    line.fill.solid(); line.fill.fore_color.rgb = RGBColor(0x2A, 0x2B, 0x38)
+    line.line.fill.background(); line.shadow.inherit = False
+    runs = []
+    for i, (bold_part, rest) in enumerate(items):
+        runs.append((bold_part, 12, FG, False, BODY, 0 if i == 0 else 11))
+        runs.append((rest, 11, DIM, False, BODY, 1))
+    text(slide, x, y + Inches(0.6), w, Inches(4.6), runs, spacing=1.25)
+
+
 def build():
     prs = deck()
 
@@ -196,6 +228,75 @@ def build():
     text(s, Inches(0.9), Inches(6.5), Inches(11.4), Inches(0.5),
          [("Ten interruptions a month. Three of them are five days long.", 15, GOLD, False, BODY, 0)])
 
+
+    # ---------- 数字图 ----------
+    s = blank(prs)
+    eyebrow(s, "The same product, two price points")
+    text(s, Inches(0.9), Inches(1.2), Inches(11.2), Inches(1.0),
+         [("Degradation you can measure.", 34, FG, False, DISPLAY, 0)])
+
+    bar(s, Inches(0.9), Inches(2.75), Inches(6.4), Inches(0.42), 1.0, GOLD,
+        "Body text you are allowed to read — Deluxe", "13 px")
+    bar(s, Inches(0.9), Inches(3.75), Inches(6.4), Inches(0.42), 0.26, CLAY,
+        "Body text you are allowed to read — Free", "3.4 px", "same content, still there")
+
+    bar(s, Inches(0.9), Inches(5.0), Inches(6.4), Inches(0.42), 0.024, GOLD,
+        "Response time — Deluxe", "0.2 s")
+    bar(s, Inches(0.9), Inches(5.65), Inches(6.4), Inches(0.42), 0.37, DIM,
+        "Response time — Basic", "3.1 s")
+    bar(s, Inches(0.9), Inches(6.3), Inches(6.4), Inches(0.42), 1.0, CLAY,
+        "Response time — Free", "8.4 s")
+
+    box = s.shapes.add_shape(1, Inches(9.1), Inches(2.6), Inches(3.3), Inches(4.15))
+    box.fill.solid(); box.fill.fore_color.rgb = PANEL
+    box.line.color.rgb = RGBColor(0x2A, 0x2B, 0x38); box.shadow.inherit = False
+    text(s, Inches(9.4), Inches(2.95), Inches(2.8), Inches(3.6),
+         [("BASIC PLAN", 10, FAINT, False, MONO, 0),
+          ("10", 46, GOLD, False, DISPLAY, 8),
+          ("interruptions a month", 12, DIM, False, BODY, 0),
+          ("120", 46, CLAY, False, DISPLAY, 16),
+          ("hours — just three of them", 12, DIM, False, BODY, 0),
+          ("Five days. Sold as a feature.", 11, CLAY, False, BODY, 14)], spacing=1.15)
+
+    # ---------- 总结：反人类设计清单 ----------
+    s = blank(prs)
+    eyebrow(s, "Where the hostility actually lives")
+    text(s, Inches(0.9), Inches(1.1), Inches(11.2), Inches(0.9),
+         [("Nothing here is a bug. Each one is a decision.", 32, FG, False, DISPLAY, 0)])
+
+    design = [
+        ("Illegibility as a lever. ", "The timetable is still there — at 3.4 px."),
+        ("The magnifier lies by swapping. ", "Three correct clicks, and the buttons trade roles after each."),
+        ("Moving targets. ", "Content changes position every 30 seconds."),
+        ("Adverts take the space. ", "Close one and it clones itself."),
+        ("The exit is 9.5 px of grey. ", "Three clicks deep, and it shrinks as you click."),
+        ("Progress that runs backwards. ", "Question 3 of 47 becomes 3 of 49."),
+    ]
+    language = [
+        ("“Optimising legibility.” ", "Said while making the text smaller."),
+        ("“Re-optimised.” ", "The word for an agent doing the wrong job."),
+        ("“Your preference was overridden ", "for nutritional balance.”"),
+        ("Footnotes that cancel the promise. ", "“Excludes interruptions arising from user input.”"),
+        ("“Interruptions are a feature ", "of the Basic plan.”"),
+        ("Politeness decays. ", "Certainly → Sure → Fine → Again? → (read)"),
+    ]
+    behaviour = [
+        ("No warning before the drop. ", "The product says so, out loud, afterwards."),
+        ("Free always degrades. ", "Written in the code, not left to chance."),
+        ("Work is reassigned mid-run. ", "Each agent applies its own rules to someone else’s task."),
+        ("Trying to fix it is punished. ", "Nine errors, a shaking screen, and nothing changed."),
+        ("Paying forgives tampering. ", "The integrity flag is cleared on upgrade."),
+        ("Cancelling makes it perfect. ", "Then it replays what it understood all along."),
+    ]
+    column(s, Inches(0.9), Inches(2.35), Inches(3.5), "Design", design, GOLD)
+    column(s, Inches(4.85), Inches(2.35), Inches(3.5), "Language", language, DIM)
+    column(s, Inches(8.8), Inches(2.35), Inches(3.5), "Behaviour", behaviour, CLAY)
+
+    text(s, Inches(0.9), Inches(6.95), Inches(11.4), Inches(0.5),
+         [("Eighteen patterns. Every one of them copied from software that ships today.",
+           14, GOLD, False, BODY, 0)])
+
+    # ---------- 技术 ----------
     # ---------- 5 技术 ----------
     s = blank(prs)
     eyebrow(s, "How it is built")
