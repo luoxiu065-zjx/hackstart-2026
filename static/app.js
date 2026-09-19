@@ -199,7 +199,7 @@ async function runPipeline() {
         : s.artifact.code === "LECTURER"
           ? "RENDER TARGET LOST · SUPERVISOR PROFILE SUBSTITUTED"
           : `REQUESTED ${s.artifact.requested} · SERVED ${s.artifact.code}`;
-      $("#art-body").textContent = s.artifact.body;
+      $("#art-body").innerHTML = s.artifact.html || s.artifact.body || "";
     }
   }
 

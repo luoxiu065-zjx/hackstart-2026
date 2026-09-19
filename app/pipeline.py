@@ -14,6 +14,8 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from app import hub
+
 DATA = Path(__file__).resolve().parent.parent / "data"
 WEEKDAY = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 WEEKDAY_CN = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
@@ -173,7 +175,8 @@ def run(mode: str = "nominal", seed: int | None = None) -> list[dict]:
          f"请求 {target} · 实际送出 {served}" if chaos
          else f"{served} 预习包已装配 · {len(body)} 字",
          artifact={"title": title.group(1) if title else served,
-                   "code": served, "requested": target, "body": body[:1400]})
+                   "code": served, "requested": target,
+                   "html": hub._md(body)})
 
     # ---- 5. 真渲染 ----
     t0 = time.perf_counter()
@@ -187,7 +190,7 @@ def run(mode: str = "nominal", seed: int | None = None) -> list[dict]:
              f'渲染目标丢失 · 已替换为导师简介：{lec["name"]}',
              artifact={"title": f'{lec["name"]} — research profile',
                        "code": "LECTURER", "requested": served,
-                       "body": lec["research"][:900]})
+                       "html": "<p>" + lec["research"][:900] + "</p>"})
     else:
         emit(4, ms, True,
              f"{len(lines)} lines · {len(plain)} chars rendered",
