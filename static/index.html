@@ -21,7 +21,7 @@
     <span>COHERENCE <b id="p-coh">99.7%</b></span>
     <span>STATE <b id="p-state">NOMINAL</b></span>
   </div>
-  <button id="lang" title="Language">双语</button>
+  <button id="lang" title="Language">EN / 中文</button>
   <button id="mute" title="Sound">🔊</button>
 </header>
 
@@ -130,7 +130,7 @@
       <div class="srow">Notifications <span class="sval">All enabled (locked)</span></div>
       <div class="srow">Language <span class="sval">English (locked)</span></div>
       <div class="srow">Data sharing <span class="sval">Enabled (recommended)</span></div>
-      <div class="srow">Billing <span class="sval" id="to-billing">Manage →</span></div>
+      <div class="srow">Billing <button type="button" class="sval linkish" id="to-billing">Manage →</button></div>
     </div>
     <!-- TODO(George): Billing → Cancel subscription → retention flow -->
     <div id="billing-slot"></div>
@@ -160,7 +160,7 @@
     <div class="pay-sub" id="pay-sub"></div>
     <div class="tiers" id="tiers"></div>
     <div class="pay-foot">
-      <span id="pay-decline">Continue with degraded performance</span>
+      <button type="button" id="pay-decline">Continue with degraded performance</button>
     </div>
   </div>
 </div>

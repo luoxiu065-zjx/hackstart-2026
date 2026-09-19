@@ -1,3 +1,8 @@
+> ⚠️ **作废声明（2026-09-19 15:10）**
+> 这份 brief 写于上午 11:40，当时的方案是 canvas 里 80 个智能体的舰队可视化。
+> 中午方向改成了「真实流水线 + 商业化降级」，**代码里从来没有实现过那个舰队**。
+> **现在的真实规格以 `SPEC.md` 为准**，本文件只作为当时决策的存档。
+
 # ORCHESTRA — Project Brief
 
 **HackStart 2026 · Theme: Stubborn Software ("fight the user")**

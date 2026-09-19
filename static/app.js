@@ -22,7 +22,7 @@ function log(en, cn, cls) {
 /* ================= 语言 / 声音 ================= */
 $("#lang").onclick = () => {
   LANG = LANG === "both" ? "en" : LANG === "en" ? "cn" : "both";
-  $("#lang").textContent = LANG === "both" ? "双语" : LANG === "en" ? "EN" : "中文";
+  $("#lang").textContent = LANG === "both" ? "EN / 中文" : LANG === "en" ? "EN" : "中文";
   applyLang();
   renderStatic();
 };
@@ -356,6 +356,15 @@ refreshState();
 log("Fleet online. 80 agents. Autonomy engaged.", "集群上线。80 个智能体。自治已开启。", "ok");
 log("Free trial active — unrestricted performance.", "免费试用中 —— 性能不受限制。", "ok");
 
+
+/* 设置页里那行 "Language English (locked)" 点了要有反应，不然评委当 bug */
+document.addEventListener("click", e => {
+  const row = e.target.closest(".srow");
+  if (!row || !/Language/.test(row.textContent)) return;
+  log("Language is locked by your administrator.",
+      "语言设置已被你的管理员锁定。", "warn");
+  if (window.Sound) Sound.fail();
+});
 
 /* ================= 藏三层的取消入口：设置 → 账单 → 灰色小字 ================= */
 $("#to-billing").onclick = () => {
