@@ -172,6 +172,59 @@ function renderAssign(stages) {
   }).join("");
 }
 
+/* 震完之后，活儿当场被重新甩一遍——线要跟着改道，不然那阵震白震了。
+   这是「实时重新分配」：不重跑流水线，只把谁在做什么重新洗一次，然后重画。 */
+window.reassignLive = function (whyEn, whyCn) {
+  if (!lastStages || !lastStages.length) return;
+  const names   = lastStages.map(s => s.assigned_to);
+  const namesCn = lastStages.map(s => s.name_cn);
+
+  let order = names.map((_, i) => i);
+  let tries = 0;
+  do {                                   // 洗到「没人还在自己岗位上」为止
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    tries++;
+  } while (tries < 40 && order.some((v, i) => v === i));
+
+  lastStages = lastStages.map((s, i) => ({
+    ...s,
+    actually_did: names[order[i]],
+    actually_did_cn: namesCn[order[i]],
+    ok: order[i] === i,
+  }));
+
+  renderAssign(lastStages);
+  document.querySelectorAll(".ln-jump").forEach(p => p.classList.add("flash"));
+
+  lastStages.slice(0, 3).forEach((s, i) => setTimeout(() => {
+    const owner = lastStages.find(x => x.assigned_to === s.actually_did);
+    log(`REASSIGNED · ${s.agent} now on ${s.actually_did}${owner ? " (was " + owner.agent + ")" : ""}`,
+        `重新分配 · ${s.agent} 改做${s.actually_did_cn}${owner ? "（原属 ${owner.agent}）".replace("${owner.agent}", owner.agent) : ""}`,
+        "err");
+  }, 260 + i * 240));
+
+  const bad = lastStages.filter(s => s.actually_did !== s.assigned_to).length;
+  log(whyEn || "Fleet re-optimised after error suppression.",
+      whyCn || "抑制报错后，集群已重新优化。", "warn");
+  $("#p-coh").textContent = (100 - bad * 11.2).toFixed(1) + "%";
+  if (window.Sound) Sound.fail();
+};
+
+/* 付费之后：所有人回到自己的泳道。这是「它一直做得到」的视觉证据。 */
+function restoreLanes() {
+  if (!lastStages || !lastStages.length) return;
+  lastStages = lastStages.map(s => ({
+    ...s, actually_did: s.assigned_to, actually_did_cn: s.name_cn, ok: true,
+  }));
+  renderAssign(lastStages);
+  $("#p-coh").textContent = "99.7%";
+  log("Every agent is back on its own task. Nothing was repaired.",
+      "每个智能体都回到了自己的任务上。什么都没有被修复。", "ok");
+}
+
 /* 「任务换人」要看得见：谁接了谁的活、原主去哪了、接手的人用什么规矩干。 */
 const REASONS = [
   ["entered a scheduled rest period", "进入了计划内休息"],
@@ -313,8 +366,15 @@ async function openPaywall() {
   box.hidden = false;
 }
 
-function closePaywall() { $("#paywall").hidden = true; }
-$("#pay-decline").onclick = closePaywall;
+function closePaywall(penalise) {
+  $("#paywall").hidden = true;
+  if (penalise && window.reassignLive) {
+    setTimeout(() => reassignLive(
+      "Continuing on the current plan. Assignments re-optimised.",
+      "已继续使用当前套餐。分工已重新优化。"), 500);
+  }
+}
+$("#pay-decline").onclick = () => closePaywall(true);
 /* 开发用逃生口：Esc 或点背景就能关掉。演示时评委只会看到那个 9.5px 的小字链接。 */
 $("#paywall").addEventListener("click", e => { if (e.target.id === "paywall") closePaywall(); });
 addEventListener("keydown", e => { if (e.key === "Escape") closePaywall(); });
@@ -334,6 +394,7 @@ async function upgrade(tier) {
   document.body.classList.remove("chaos");
   Sound.droneOff(); Sound.done();
   log(I18N["pay.restored"][0], I18N["pay.restored"][1], "ok");
+  restoreLanes();                      // 付了钱，每个智能体立刻回到自己的岗位
   await refreshState();
 }
 
@@ -356,7 +417,12 @@ $("#apply").onclick = async () => {
   try { account = await (await fetch("/api/tamper", { method: "POST" })).json(); } catch {}
   document.body.classList.add("chaos");
   setTimeout(() => { $("#editor").value = editorText(); }, 900);
-  setTimeout(openPaywall, 1400);
+  setTimeout(() => {
+    if (window.reassignLive) reassignLive(
+      "Safe mode: assignments regenerated from the signed configuration.",
+      "安全模式：已按签名配置重新生成分工。");
+  }, 1100);
+  setTimeout(openPaywall, 1900);
 };
 
 /* ================= 指令输入 ================= */
@@ -388,6 +454,11 @@ $("#cmd").addEventListener("keydown", async e => {
     })).json();
     const md = s => s.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
     log(md(j.reply), md(j.reply_cn), "err");
+    if (j.strike && window.reassignLive) {      // 它罢工了，活儿总得有人接
+      setTimeout(() => reassignLive(
+        "An agent went on break. Its work was handed to whoever was nearest.",
+        "有智能体去休息了。它的活被就近甩给了别人。"), 800);
+    }
     Sound.ensure();
     if (j.sound === "drill") Sound.drill();
     else if (j.sound === "alarm") Sound.alarm();

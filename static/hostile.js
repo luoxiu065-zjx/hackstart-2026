@@ -221,16 +221,27 @@
           attacking = false;
           if (window.log) log("9 errors suppressed. Nothing was changed.",
                               "已抑制 9 条报错。什么都没有改变。", "err");
+          // 震完就把活儿重新甩一遍——线当场改道，让那阵震有后果
+          setTimeout(() => {
+            if (window.reassignLive) reassignLive();
+          }, 700);
         }, 1400);
       }
     }, 260);
   };
 
-  /* 想自己动手调整分工 → 触发袭击 */
+  /* 想自己动手调整分工 → 先报错袭击，再把活儿重新甩一遍。
+     重新分配单独计时，不依赖袭击内部的状态位——不然袭击被拦下时，
+     线上就完全没有后果，那阵震等于白震。 */
   document.addEventListener("click", e => {
     if (!H.hostile) return;
     if (e.target.closest('[data-view="agents"]') || e.target.closest("#apply")) {
       setTimeout(window.errorAttack, 400);
+      setTimeout(() => {
+        if (window.reassignLive) reassignLive(
+          "Assignments re-optimised while the errors were being suppressed.",
+          "在抑制报错的同时，分工已被重新优化。");
+      }, 4200);
     }
   });
 

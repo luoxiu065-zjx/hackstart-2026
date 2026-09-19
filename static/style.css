@@ -972,3 +972,12 @@ body.hostile.lens-3 .card.tiny:hover .micro{font-size:14px}
           padding-bottom:1px}
 .ob-about:hover{border-bottom-color:#c9a36a}
 .ob-about .cn{display:inline;margin-left:6px;color:rgba(201,163,106,.62)}
+
+
+/* 重新分配时，改道的线闪一下，眼睛才抓得住 */
+@keyframes jumpflash{
+  0%{opacity:0;stroke-width:3.2}
+  40%{opacity:1;stroke-width:3.2}
+  100%{opacity:.85;stroke-width:1.6}
+}
+.ln-jump.flash{animation:jumpflash .75s ease-out}
