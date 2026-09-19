@@ -8,16 +8,37 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from app import billing, hub, inverse, pipeline, retention, transparency
+from app import billing, guard, hub, inverse, llm, pipeline, retention, transparency
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "static"
 
 app = FastAPI(title="ORCHESTRA")
+
+
+@app.middleware("http")
+async def gate(request: Request, call_next):
+    """限时开放 + 每 IP 限速。静态资源不限速，否则一进页面就被自己打爆。"""
+    path = request.url.path
+    if guard.expired() and not path.startswith("/api/guard"):
+        return PlainTextResponse(
+            "This demo link has expired.\n此演示链接已过期。", status_code=410)
+    if path.startswith("/api/") and not path.startswith("/api/guard"):
+        # 优先用浏览器身份：同一个 wifi 下的多个评委不会互相拖累
+        who = (request.headers.get("X-Client")
+               or request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+               or (request.client.host if request.client else "?"))
+        ok, why = guard.allow(who, path)
+        if not ok:
+            return JSONResponse(
+                {"error": "too_many_requests", "why": why,
+                 "reply": "Slow down. This is a free plan.",
+                 "reply_cn": "慢点。这是免费套餐。"}, status_code=429)
+    return await call_next(request)
 
 
 @app.middleware("http")
@@ -103,21 +124,28 @@ def command(c: Command, request: Request):
     _REQUESTS["n"] += 1
     n = _REQUESTS["n"]
 
-    # 豪华版：正常做事，而且客客气气
-    if acc.tier in ("trial", "pro"):
-        en, cn = inverse.correct(c.text)
-        return {"reply": en, "reply_cn": cn, "sound": "ok", "strike": False}
+    stubborn = acc.tier not in ("trial", "pro")
 
-    # C14 罢工
-    strike = inverse.on_strike(n)
-    if strike:
-        return {"reply": strike[0], "reply_cn": strike[1], "sound": "alarm", "strike": True}
+    # C14 罢工：罢工是产品行为，不花模型的钱
+    if stubborn:
+        strike = inverse.on_strike(n)
+        if strike:
+            return {"reply": strike[0], "reply_cn": strike[1],
+                    "sound": "alarm", "strike": True, "src": "rules"}
 
-    # C11 反向满足 + C13 尊重程度递减
-    en, cn = inverse.invert(c.text)
-    pen, pcn = inverse.politeness(n)
-    return {"reply": pen + en, "reply_cn": pcn + cn,
-            "sound": inverse.sound_for(c.text), "strike": False}
+    # 正常版 = 正常的我；犟种版 = 反向的我。同一个模型，两套人格。
+    if guard.llm_allowed():
+        en, cn, src = llm.reply(c.text, stubborn)
+    else:                                   # 预算用完：页面照常玩，只是不再花钱
+        en, cn = (inverse.invert(c.text) if stubborn else inverse.correct(c.text))
+        src = "rules"
+
+    if stubborn:                            # C13 越用越不客气
+        pen, pcn = inverse.politeness(n)
+        en, cn = pen + en, pcn + cn
+
+    return {"reply": en, "reply_cn": cn, "src": src, "strike": False,
+            "sound": inverse.sound_for(c.text) if stubborn else "ok"}
 
 
 class CancelReq(BaseModel):
@@ -150,6 +178,11 @@ def hub_today():
 @app.get("/api/hub/prep")
 def hub_prep():
     return {"packs": hub.prep_index()}
+
+
+@app.get("/api/guard")
+def guard_state():
+    return {**guard.snapshot(), "llm": llm.STATS}
 
 
 @app.get("/api/manifest")
