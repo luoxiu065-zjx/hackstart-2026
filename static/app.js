@@ -22,7 +22,6 @@ function log(en, cn, cls) {
 /* ================= 语言 / 声音 ================= */
 $("#lang").onclick = () => {
   LANG = LANG === "both" ? "en" : LANG === "en" ? "cn" : "both";
-  $("#lang").textContent = LANG === "both" ? "EN / 中文" : LANG === "en" ? "EN" : "中文";
   applyLang();
   renderStatic();
 };
@@ -279,7 +278,7 @@ async function runPipeline() {
 
   let data;
   try {
-    data = await (await fetch("/api/pipeline")).json();
+    data = await (await fetch("/api/pipeline?lang=" + (LANG === "cn" ? "cn" : "en"))).json();
   } catch {
     $("#run-msg").textContent = "backend offline — python -m uvicorn app.main:app --port 8001";
     btn.disabled = false;

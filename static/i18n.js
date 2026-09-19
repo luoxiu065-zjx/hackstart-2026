@@ -58,6 +58,12 @@ function bi(en, cn) {
 }
 
 function applyLang() {
+  /* 按钮标签也归 applyLang 管——之前只在点击时更新，用脚本切语言时会不同步，
+     结果「纯英文」模式下按钮上还挂着「中文」两个字。 */
+  const btn = document.getElementById("lang");
+  if (btn) btn.textContent = LANG === "both" ? "EN / 中文"
+                           : LANG === "en"   ? "EN"
+                           : "中文";
   document.querySelectorAll("[data-i]").forEach(el => {
     const k = el.dataset.i;
     const sub = tSub(k);

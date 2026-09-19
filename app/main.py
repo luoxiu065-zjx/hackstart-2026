@@ -99,7 +99,7 @@ def reset(request: Request):
 # ---------------------------------------------------------------------------
 
 @app.get("/api/pipeline")
-def run_pipeline(request: Request, seed: int | None = None):
+def run_pipeline(request: Request, seed: int | None = None, lang: str = "cn"):
     """真实流水线。抽不抽风由套餐决定，不由前端决定。"""
     acc = _acc(request)
     acc.runs += 1
@@ -111,7 +111,7 @@ def run_pipeline(request: Request, seed: int | None = None):
         "reason": reason,
         "reason_cn": reason_cn,
         "account": acc.snapshot(),
-        "stages": pipeline.run("chaos" if glitch else "nominal", seed),
+        "stages": pipeline.run("chaos" if glitch else "nominal", seed, lang),
     }
 
 

@@ -71,9 +71,13 @@ def _lecturers() -> list[dict]:
     return json.loads((DATA / "lecturers.json").read_text(encoding="utf-8"))
 
 
-def _prep_packs() -> dict[str, str]:
+def _prep_packs(lang: str = "cn") -> dict[str, str]:
+    """英文模式读 data/prep-en/（机器翻译好的那份），没有就退回中文原件。"""
+    folder = DATA / ("prep-en" if lang == "en" else "prep")
+    if not folder.exists():
+        folder = DATA / "prep"
     return {p.stem.split("-")[0]: p.read_text(encoding="utf-8")
-            for p in sorted((DATA / "prep").glob("*.md"))}
+            for p in sorted(folder.glob("*.md"))}
 
 
 # --------------------------------------------------------------------------
@@ -90,12 +94,12 @@ STAGES = [
 ]
 
 
-def run(mode: str = "nominal", seed: int | None = None) -> list[dict]:
+def run(mode: str = "nominal", seed: int | None = None, lang: str = "cn") -> list[dict]:
     rng = random.Random(seed)
     chaos = mode == "chaos"
     results: list[StageResult] = []
 
-    events, modules, lecturers, packs = _ics_events(), _modules(), _lecturers(), _prep_packs()
+    events, modules, lecturers, packs = _ics_events(), _modules(), _lecturers(), _prep_packs(lang)
 
     names    = [s[1] for s in STAGES]
     names_cn = [s[2] for s in STAGES]
