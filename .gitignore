@@ -6,3 +6,5 @@ dist/
 build/
 .env
 *.log
+__pycache__/
+.pytest_cache/
