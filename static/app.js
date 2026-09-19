@@ -123,6 +123,16 @@ const SHELL = [
 /* ---- 智能体 ↔ 任务 分配表：用流水线的真实改派结果填 ---- */
 function renderAssign(stages) {
   if (window.renderLanes) renderLanes(stages);
+  if (window.renderProfiles) renderProfiles(stages);
+  const ph = $("#pf-h");
+  if (ph) {
+    const bad = (stages || []).filter(s => s.actually_did !== s.assigned_to).length;
+    ph.innerHTML = bad
+      ? bi("Each agent is still following its own rules — just on someone else's task. That is why the output is absurd rather than broken.",
+           "每个智能体都还在严格遵守自己的准则——只是用在了别人的任务上。所以结果是荒谬，不是报错。")
+      : bi("What each agent was trained on, and the rules it follows. Click a card to open its dossier.",
+           "每个智能体学过什么、按什么准则干活。点卡片展开它的档案。");
+  }
   const h = $("#lanes-hint");
   if (h) {
     const bad = (stages || []).filter(s => s.actually_did !== s.assigned_to).length;

@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from app import billing, guard, hub, inverse, llm, pipeline, retention, transparency
+from app import agents, billing, guard, hub, inverse, llm, pipeline, retention, transparency
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "static"
@@ -178,6 +178,12 @@ def hub_today():
 @app.get("/api/hub/prep")
 def hub_prep():
     return {"packs": hub.prep_index()}
+
+
+@app.get("/api/agents")
+def agent_profiles():
+    """每个 agent 学过什么、按什么准则干活——混乱之所以荒谬，是因为它在严格执行错的规矩。"""
+    return {"profiles": agents.all_profiles()}
 
 
 @app.get("/api/guard")
