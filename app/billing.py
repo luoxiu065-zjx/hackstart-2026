@@ -28,6 +28,8 @@ class Tier:
     footnote: str
     glitch_rate: float
     latency: str
+    blurb_cn: str = ""
+    footnote_cn: str = ""
 
 
 TIERS: dict[str, Tier] = {
@@ -42,16 +44,22 @@ TIERS: dict[str, Tier] = {
     "basic": Tier("basic", "Basic", "£9.99 / mo",
                   "Reduced interruptions.*",
                   "*Up to 3 interruptions per hour. Interruptions are a feature of the Basic plan.",
-                  0.45, "3.1s"),
+                  0.45, "3.1s",
+                  "减少中断。*",
+                  "*每小时最多 3 次中断。中断是基础版的一项功能。"),
     "pro": Tier("pro", "Deluxe", "£39.99 / mo",
                 "Interruption-free operation.**",
                 "**Excludes scheduled interruptions, maintenance interruptions, "
                 "and interruptions arising from user input.",
-                0.08, "0.2s"),
+                0.08, "0.2s",
+                "运行全程无中断。**",
+                "**不含计划内中断、维护性中断，以及因用户输入而产生的中断。"),
     "enterprise": Tier("enterprise", "Enterprise", "Contact sales",
                        "Everything, eventually.",
                        "A representative will contact you within 6–8 weeks.",
-                       0.0, "—"),
+                       0.0, "—",
+                       "应有尽有，迟早。",
+                       "我们的代表将在 6–8 周内与您联系。"),
 }
 
 
