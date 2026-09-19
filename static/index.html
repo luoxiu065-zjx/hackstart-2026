@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ORCHESTRA — Autonomous Agent Fleet</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">ORCHESTRA<span>▸</span></div>
+  <div class="tagline">Autonomous Agent Fleet · Enterprise Plan</div>
+  <div class="pills">
+    <span>AGENTS <b id="p-agents">80</b></span>
+    <span>TASKS <b id="p-tasks">12</b></span>
+    <span>COHERENCE <b id="p-coh">99.7%</b></span>
+    <span>STATE <b id="p-state">NOMINAL</b></span>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-h">FLEET</div>
+  <div class="nav on"  data-view="dashboard">Dashboard</div>
+  <div class="nav"     data-view="agents">Agent Assignments</div>
+  <div class="nav"     data-view="code">Configuration</div>
+  <div class="nav-h">ACCOUNT</div>
+  <div class="nav"     data-view="settings">⚙ Settings</div>
+  <div class="spacer"></div>
+  <div class="build">v4.2.1 · build 8891</div>
+</nav>
+
+<main>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="view-dashboard" class="view on">
+
+    <div class="promo promo-a">
+      <div class="promo-tag">LIMITED TIME</div>
+      <div class="promo-big">50% OFF</div>
+      <div class="promo-sub">ORCHESTRA PRO — upgrade now and unlock 40 more agents you will never use</div>
+      <button class="promo-x" title="Close">×</button>
+    </div>
+
+    <div class="grid">
+
+      <div class="card tiny">
+        <div class="card-h">YOUR TIMETABLE <span class="card-note">consolidated · 4 sources</span></div>
+        <div class="micro" id="timetable"></div>
+      </div>
+
+      <div class="card tiny">
+        <div class="card-h">SUPERVISOR RESEARCH INTERESTS</div>
+        <div class="micro" id="research"></div>
+      </div>
+
+      <div class="promo promo-b">
+        <div class="promo-big2">🎁 REFER A FRIEND</div>
+        <div class="promo-sub">Both of you get 3 months of a feature we are deprecating in October</div>
+      </div>
+
+      <div class="card tiny">
+        <div class="card-h">COURSEWORK DEADLINES <span class="card-note">next 14 days</span></div>
+        <div class="micro" id="deadlines"></div>
+      </div>
+
+      <div class="promo promo-c">
+        <div class="promo-marquee">
+          <span>★ NEW: AGENTS CAN NOW SEND EMOJI ★ NEW: DARK MODE (BETA, BREAKS EVERYTHING) ★ NEW: AGENTS CAN NOW SEND EMOJI ★</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ AGENT ASSIGNMENTS ============ -->
+  <section id="view-agents" class="view">
+    <div class="view-h">
+      AGENT ↔ TASK ASSIGNMENT
+      <span class="view-note">live · re-optimised continuously</span>
+    </div>
+    <table class="assign">
+      <thead><tr><th>AGENT</th><th>ASSIGNED TO</th><th>ACTUALLY DOING</th><th>STATUS</th></tr></thead>
+      <tbody id="assign-body"></tbody>
+    </table>
+  </section>
+
+  <!-- ============ CONFIGURATION ============ -->
+  <section id="view-code" class="view">
+    <div class="view-h">
+      CONFIGURATION
+      <span class="view-note">advanced · changes apply immediately</span>
+    </div>
+    <p class="code-hint">Edit the assignment map to fix a misrouted agent. Changes are validated by the optimiser before they take effect.</p>
+    <textarea id="editor" spellcheck="false"></textarea>
+    <div class="code-actions">
+      <button id="apply">Apply changes</button>
+      <span id="apply-msg"></span>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS (George 的入口) ============ -->
+  <section id="view-settings" class="view">
+    <div class="view-h">SETTINGS</div>
+    <div class="settings-list">
+      <div class="srow">Notifications <span class="sval">All enabled (locked)</span></div>
+      <div class="srow">Language <span class="sval">English (locked)</span></div>
+      <div class="srow">Data sharing <span class="sval">Enabled (recommended)</span></div>
+      <div class="srow">Billing <span class="sval" id="to-billing">Manage →</span></div>
+    </div>
+    <!-- TODO(George): Billing → Cancel subscription → retention flow -->
+    <div id="billing-slot"></div>
+  </section>
+
+</main>
+
+<aside class="stream">
+  <div class="stream-h">EVENT STREAM</div>
+  <div id="log"></div>
+</aside>
+
+<footer>
+  <div class="cmd">
+    <span class="ps">&gt;</span>
+    <input id="cmd" autocomplete="off" placeholder="Tell the fleet what you need…">
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
