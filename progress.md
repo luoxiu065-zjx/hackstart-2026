@@ -56,3 +56,9 @@ Use this table when resuming to confirm the current phase, destination, goal, fi
 ---
 
 *Update this file after completing a phase, running validation, or encountering an error.*
+
+## 2026-09-19 10:0x · v0.1 上屏
+- 题目确认：Stubborn Software = 故意让用户抓狂的反人类界面（user-hostile design / dark patterns）
+- 产出 `web/index.html`，三个模块可玩：只能 +1 的年龄输入、双重否定开关组、会躲的提交按钮
+- 顶部计时器 + 点击计数，提交后出结算页（对比「正常表单 3 次点击 12 秒」）
+- 已在浏览器打开，等用户试玩反馈
