@@ -68,8 +68,12 @@ def build_ass(frames_dir: str, font: str) -> str:
             while j + 1 < len(subs) and subs[j + 1][1] == subs[i][1]:
                 j += 1
             t0, t1 = i / FPS, (j + 1) / FPS
-            f.write(f"Dialogue: 0,{ts(t0)},{ts(t1)},EN,,0,0,0,,{esc(subs[i][2])}\n")
-            f.write(f"Dialogue: 0,{ts(t0)},{ts(t1)},CN,,0,0,0,,{esc(subs[i][1])}\n")
+            row = subs[i]
+            if len(row) >= 3:            # 双语版：英文小字在上，中文大字在下
+                f.write(f"Dialogue: 0,{ts(t0)},{ts(t1)},EN,,0,0,0,,{esc(row[2])}\n")
+                f.write(f"Dialogue: 0,{ts(t0)},{ts(t1)},CN,,0,0,0,,{esc(row[1])}\n")
+            else:                        # 英文版：只有一行，用大字那个样式
+                f.write(f"Dialogue: 0,{ts(t0)},{ts(t1)},CN,,0,0,0,,{esc(row[1])}\n")
             i = j + 1
     return path
 

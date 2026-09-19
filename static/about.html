@@ -141,6 +141,15 @@
   .sig{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:34px;
        letter-spacing:.1em}
 
+  /* 语言开关：固定右上角，默认英文（给评委看），点一下变双语 */
+  #lang{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:20;
+        font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;cursor:pointer;
+        background:rgba(20,21,31,.92);color:var(--gold);border:1px solid rgba(201,163,106,.4);
+        padding:8px 14px;border-radius:99px;backdrop-filter:blur(8px)}
+  #lang:hover{background:rgba(201,163,106,.12)}
+  #lang:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  body[data-lang="en"] .cn{display:none}
+
   @media (max-width:720px){
     .act{grid-template-columns:1fr;gap:18px}
     .drop{grid-template-columns:1fr;gap:14px}
@@ -151,6 +160,8 @@
 
 </head>
 <body>
+<button id="lang" type="button" aria-label="Switch language">EN</button>
+
 <div class="wrap">
 
   <header>
@@ -427,6 +438,21 @@ WED 16:00  Supervisor meeting                B32 / 4011</div>
 </div>
 
 <script>
+  (function () {
+    var btn = document.getElementById("lang");
+    function set(mode) {
+      document.body.dataset.lang = mode;
+      btn.textContent = mode === "en" ? "EN" : "中 / EN";
+      try { localStorage.setItem("orchestra-about-lang", mode); } catch (e) {}
+    }
+    var saved = "en";
+    try { saved = localStorage.getItem("orchestra-about-lang") || "en"; } catch (e) {}
+    set(saved);
+    btn.addEventListener("click", function () {
+      set(document.body.dataset.lang === "en" ? "both" : "en");
+    });
+  })();
+
   (function () {
     var LEVELS = ["3.4px", "4.8px", "7.6px", "14px"];
     var level = 0, swapped = false;
