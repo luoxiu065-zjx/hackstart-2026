@@ -141,6 +141,17 @@ def cancel(req: CancelReq, request: Request):
 # ---------------------------------------------------------------------------
 # 透明层：开场清单 + 每个阶段的真实源码
 # ---------------------------------------------------------------------------
+@app.get("/api/hub/today")
+def hub_today():
+    """正例：正常版学业助手的「今日」数据。时间段 + 重要度，不是 9 点做什么。"""
+    return hub.today()
+
+
+@app.get("/api/hub/prep")
+def hub_prep():
+    return {"packs": hub.prep_index()}
+
+
 @app.get("/api/manifest")
 def manifest():
     return {"steps": transparency.manifest()}

@@ -435,3 +435,80 @@ body.hostile.lens-small .micro{font-size:2px}
 .cap-code span{display:inline-block;font-size:26px;font-weight:700;color:#cfe3ff;
                letter-spacing:2px;text-shadow:0 1px 0 #2b3a5c}
 .cap-msg{font-size:10.5px;color:var(--amber);line-height:1.6;min-height:14px;margin-top:8px}
+
+/* 修：双语把小徽章撑成两行，99px 的胶囊圆角就裂成了括号 */
+.badge{display:inline-flex;flex-direction:column;align-items:center;
+       border-radius:8px;padding:3px 10px;line-height:1.4;white-space:nowrap}
+.badge .cn{display:block;font-size:.88em;margin-top:1px;color:inherit;opacity:.72}
+.ret-badge{display:inline-flex;flex-direction:column;align-items:center;
+           border-radius:10px;line-height:1.4}
+.ret-badge .cn{display:block;margin-top:1px}
+/* 顶部套餐条同理，别被第二行撑破 */
+.plan{white-space:nowrap}
+.lensbar button{display:inline-flex;flex-direction:column;align-items:flex-start;
+                line-height:1.35}
+.lensbar button .lb{margin-left:0}
+
+/* ============================================================
+   正例：付费版的「今日」。
+   和混乱版反着来——衬线标题、大留白、暖色、字大到能读。
+   字体全用系统自带，投影上不会因为网络卡住。
+   ============================================================ */
+.deluxe{display:none;max-width:1080px;padding:10px 0 40px}
+body:not(.hostile) #deluxe{display:block}
+body.hostile #deluxe{display:none}
+
+.dx-top{display:flex;gap:34px;align-items:flex-start;padding-bottom:26px;
+        border-bottom:1px solid #1b2436;margin-bottom:30px}
+.dx-date{display:flex;align-items:baseline;gap:12px;flex:0 0 auto}
+.dx-day{font-family:Georgia,"Times New Roman",serif;font-size:76px;line-height:.86;
+        font-weight:400;color:#e8c07a;letter-spacing:-3px}
+.dx-dmeta{display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:2px;
+          color:#6d7ca4;text-transform:uppercase}
+.dx-lead{padding-top:4px}
+.dx-kicker{font-size:10px;letter-spacing:2.6px;color:#6d7ca4;margin-bottom:9px}
+.dx-h{font-family:Georgia,"Times New Roman",serif;font-size:27px;font-weight:400;
+      line-height:1.3;color:#eef2fb;letter-spacing:-.4px;margin-bottom:9px}
+.dx-sub{font-size:13.5px;line-height:1.8;color:#8a97b8;max-width:560px}
+
+.dx-cols{display:grid;grid-template-columns:1fr 300px;gap:34px;align-items:start}
+
+/* ---- 时间轴 ---- */
+.dx-band{margin-bottom:26px}
+.dx-band-h{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.dx-band-h b{font-family:Georgia,serif;font-size:15px;font-weight:400;color:#c9d4ec;
+             letter-spacing:.5px}
+.dx-band-h i{flex:1;height:1px;background:#1b2436}
+.dx-band-h em{font-style:normal;font-size:10px;letter-spacing:1.6px;color:#4d5a7d}
+
+.dx-item{display:grid;grid-template-columns:62px 12px 1fr;gap:14px;align-items:start;
+         padding:15px 0;border-bottom:1px solid #151d2e}
+.dx-item:last-child{border-bottom:0}
+.dx-time{font-size:15px;color:#c9d4ec;font-variant-numeric:tabular-nums;padding-top:3px}
+.dx-time small{display:block;font-size:10.5px;color:#4d5a7d;margin-top:2px}
+.dx-dot{width:9px;height:9px;border-radius:50%;margin-top:9px;background:#3a4767}
+.dx-item.red .dx-dot{background:#e0785f;box-shadow:0 0 0 4px rgba(224,120,95,.14)}
+.dx-item.amber .dx-dot{background:#e8c07a;box-shadow:0 0 0 4px rgba(232,192,122,.13)}
+.dx-name{font-family:Georgia,serif;font-size:19px;color:#eef2fb;line-height:1.35;
+         margin-bottom:5px}
+.dx-meta{font-size:11.5px;color:#6d7ca4;line-height:1.75}
+.dx-meta b{color:#8a97b8;font-weight:400}
+.dx-why{font-size:12.5px;color:#a8b4d2;line-height:1.75;margin-top:8px;
+        padding-left:13px;border-left:2px solid #2a3350}
+.dx-empty{font-size:12.5px;color:#5b688b;line-height:1.8;padding:6px 0}
+
+/* ---- 右栏 ---- */
+.dx-card{background:#0d1220;border:1px solid #1b2436;border-radius:12px;padding:18px 20px;
+         margin-bottom:16px}
+.dx-card h4{font-size:10px;letter-spacing:2.2px;color:#6d7ca4;font-weight:500;margin-bottom:14px}
+.dx-prep-item{display:flex;gap:11px;align-items:flex-start;padding:10px 0;
+              border-bottom:1px solid #151d2e;font-size:12.5px;line-height:1.7;color:#a8b4d2}
+.dx-prep-item:last-child{border-bottom:0}
+.dx-check{flex:0 0 15px;height:15px;border:1px solid #2f3b58;border-radius:4px;margin-top:2px;
+          display:flex;align-items:center;justify-content:center;font-size:10px;
+          color:#0b0f1a;cursor:pointer;transition:.15s}
+.dx-check.on{background:#e8c07a;border-color:#e8c07a}
+.dx-prep-item.done{color:#5b688b;text-decoration:line-through}
+.dx-quiet{background:none;border:0;padding:0}
+.dx-quiet p{font-size:11px;line-height:1.85;color:#4d5a7d}
+.dx-quiet b{color:#6d7ca4;font-weight:400}

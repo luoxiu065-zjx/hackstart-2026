@@ -187,6 +187,9 @@ def prep_index() -> list[dict]:
         body = p.read_text(encoding="utf-8")
         title = re.search(r"^# (.+)$", body, re.M)
         first = next((l for l in body.splitlines() if l.startswith("- **上课")), "")
+        # 预习包里的第一条具体动作——正例界面要显示真内容，不是一句套话
+        act = re.search(r"^1\.\s*(.+)$", body, re.M)
+        action = re.sub(r"[*`#]", "", act.group(1)).strip() if act else ""
         out.append({
             "code": code,
             "week": week,
@@ -194,6 +197,7 @@ def prep_index() -> list[dict]:
             "title": title.group(1) if title else f"{code} 第{week}周",
             "when": first.replace("- **上课（英国时间）**：", "").strip(),
             "lecturer": (_lecturer_for(code) or {}).get("name", ""),
+            "first_action": action[:150],
         })
     return out
 

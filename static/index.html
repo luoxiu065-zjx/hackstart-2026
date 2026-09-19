@@ -68,6 +68,32 @@
 
   <!-- ============ DASHBOARD ============ -->
   <section id="view-dashboard" class="view">
+    <!-- 正例：付费版看到的东西。克制、留白、能读。 -->
+    <section class="deluxe" id="deluxe">
+      <header class="dx-top">
+        <div class="dx-date">
+          <span class="dx-day" id="dx-day">—</span>
+          <div class="dx-dmeta">
+            <span id="dx-wd"></span>
+            <span id="dx-mon"></span>
+          </div>
+        </div>
+        <div class="dx-lead">
+          <div class="dx-kicker" id="dx-kicker"></div>
+          <h2 class="dx-h" id="dx-h"></h2>
+          <p class="dx-sub" id="dx-sub"></p>
+        </div>
+      </header>
+
+      <div class="dx-cols">
+        <div class="dx-timeline" id="dx-timeline"></div>
+        <aside class="dx-side">
+          <div class="dx-card" id="dx-prep"></div>
+          <div class="dx-card dx-quiet" id="dx-prov"></div>
+        </aside>
+      </div>
+    </section>
+
     <div id="promos" hidden>
     <div class="promo promo-a">
       <div class="promo-tag">LIMITED TIME</div>
@@ -170,6 +196,7 @@
 <script src="i18n.js"></script>
 <script src="app.js"></script>
 <script src="retention.js"></script>
+<script src="deluxe.js"></script>
 <script src="hostile.js"></script>
 <script src="relogin.js"></script>
 <script src="onboard.js"></script>
